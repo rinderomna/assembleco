@@ -1,6 +1,5 @@
 
 Letra: var #1		; Contem a letra que foi digitada
-Rand: var #1        ; Número que será coletado pesualeatoriamente
 quadradinhoPosition : var #1
 
 jmp definicoes
@@ -23,35 +22,35 @@ fim_definicoes:
     store Branco, r3 
 ; --- Fim de Guardar as cores na memória ---
 
-mensagem : string "Digite Algo"
-apaga_mensagem: string "           "
-
 jmp main
 
 ;---- Inicio do Programa Principal -----
 
 main:
-    loadn r0, #490
-    loadn r1, #mensagem
-    call Imprimestr 
+    call printCaixinhas
 
-    call digLetra
+    loadn r0, #131
+    loadn r1, #4
+    loadn r2, #140
 
-    loadn r1, #apaga_mensagem
-    call Imprimestr
+    loadn r4, #6
+    main_caixinhas_loop_vertical:
+        loadn r3, #5
+        main_caixinha_loop_linha:
+            call digLetra
+            load r5, Letra
 
-  ;  load r2, Rand
-  ;  loadn r3, #5
-  ;  mod r2, r2, r3
+            outchar r5, r0
 
-   ; loadn r4, #palavras
+            add r0, r0, r1 ; somar 4 a posicao para proximo
 
-   ; add r1, r4, r2 ; r1 contem agora endereco da palavra aleatoria
-   ; call Imprimestr
-    
+        dec r3
+        jnz main_caixinha_loop_linha
+        add r0, r0, r2 ; somar 140 a posicao (seguir na proxima linha)
+    dec r4
+    jnz main_caixinhas_loop_vertical
+
 	halt
-
-    jmp fim_do_codigo
 	
 ;---- Fim do Programa Principal -----
 	
@@ -103,13 +102,10 @@ digLetra:	; Espera que uma tecla seja digitada e salva na variavel global "Letra
 	push r0
 	push r1
 	push r2
-    push r3
 	loadn r1, #255	; Se nao digitar nada vem 255
 	loadn r2, #0	; Logo que programa a FPGA o inchar vem 0
-    loadn r3, #0    ; numero aleatorio
 
    digLetra_Loop:
-        inc r3
 		inchar r0			; Le o teclado, se nada for digitado = 255
 		cmp r0, r1			;compara r0 com 255
 		jeq digLetra_Loop	; Fica lendo ate' que digite uma tecla valida
@@ -118,15 +114,11 @@ digLetra:	; Espera que uma tecla seja digitada e salva na variavel global "Letra
 
 	store Letra, r0			; Salva a tecla na variavel global "Letra"
 	
-   digLetra_Loop2:
-        inc r3
+   digLetra_Loop2:	
 		inchar r0			; Le o teclado, se nada for digitado = 255
 		cmp r0, r1			;compara r0 com 255
 		jne digLetra_Loop2	; Fica lendo ate' que digite uma tecla valida
 	
-    store Rand, r3
-
-    pop r3
 	pop r2
 	pop r1
 	pop r0
@@ -180,6 +172,35 @@ ImprimestrSai:
 	pop r1
 	pop r0
 	rts		; retorno da subrotina
+
+definicoes:
+
+quadradinhoPosition : var #1
+
+quadradinho : var #8
+  static quadradinho + #0, #2 ; se
+  static quadradinho + #1, #1 ; horizontal
+  static quadradinho + #2, #3 ; sd
+  ;38  espacos para o proximo caractere
+  static quadradinho + #3, #0 ; vertical
+  ;2  espacos para o proximo caractere
+  static quadradinho + #4, #0 ; vertical
+  ;38  espacos para o proximo caractere
+  static quadradinho + #5, #4 ; ie
+  static quadradinho + #6, #1 ; horizontal
+  static quadradinho + #7, #5 ; id
+
+quadradinhoGaps : var #8
+  static quadradinhoGaps + #0, #0
+  static quadradinhoGaps + #1, #0
+  static quadradinhoGaps + #2, #0
+  static quadradinhoGaps + #3, #37
+  static quadradinhoGaps + #4, #1
+  static quadradinhoGaps + #5, #37
+  static quadradinhoGaps + #6, #0
+  static quadradinhoGaps + #7, #0
+
+jmp fim_definicoes
 
 printquadradinho:
   push R0
@@ -254,49 +275,3 @@ apagarquadradinho:
   pop R1
   pop R0
   rts
-
-;-----------------------------------------------------------------------------------------------
-definicoes:
-
-quadradinhoPosition : var #1
-
-quadradinho : var #8
-  static quadradinho + #0, #2 ; se
-  static quadradinho + #1, #1 ; horizontal
-  static quadradinho + #2, #3 ; sd
-  ;38  espacos para o proximo caractere
-  static quadradinho + #3, #0 ; vertical
-  ;2  espacos para o proximo caractere
-  static quadradinho + #4, #0 ; vertical
-  ;38  espacos para o proximo caractere
-  static quadradinho + #5, #4 ; ie
-  static quadradinho + #6, #1 ; horizontal
-  static quadradinho + #7, #5 ; id
-
-quadradinhoGaps : var #8
-  static quadradinhoGaps + #0, #0
-  static quadradinhoGaps + #1, #0
-  static quadradinhoGaps + #2, #0
-  static quadradinhoGaps + #3, #37
-  static quadradinhoGaps + #4, #1
-  static quadradinhoGaps + #5, #37
-  static quadradinhoGaps + #6, #0
-  static quadradinhoGaps + #7, #0
-
-;palavras: #var 5
-    ;word0: string "ABACO"
-   ; word1: string "BOLAS"
-   ; word2: string "LIRIO"
-    ;word3: string "PAULO"
-   ; word4: string "FELIZ"
-     
-   ; static palavras + #0, #word0
-   ; static palavras + #1, #word1
-   ; static palavras + #2, #word2
-   ; static palavras + #3, #word3
-   ; static palavras + #4, #word4
-
-jmp fim_definicoes
-
-;-------------------------------------------------------------------------------------------------
-fim_do_codigo:
