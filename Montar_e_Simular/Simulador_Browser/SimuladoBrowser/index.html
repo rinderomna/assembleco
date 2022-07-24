@@ -1,0 +1,73 @@
+<html>
+	<head>
+
+	<meta charset="UTF-8"/>
+	<link rel="stylesheet" type="text/css" href="default.css">
+	<link href='http://fonts.googleapis.com/css?family=Roboto' rel='stylesheet' type='text/css'>
+	<script language="javascript" type="text/javascript" src="Model.js"></script>
+	<script language="javascript" type="text/javascript" src="Controller.js"></script>
+	<script language="javascript" type="text/javascript" src="Simulador.js"></script>
+	<script language="javascript" type="text/javascript" src="Mnemonics.js"></script>
+	<script language="javascript" type="text/javascript" src="view.js"></script>
+	
+	<script>	
+	var simulador;
+	window.onload = function() {
+		simulador = new Simulador();
+	}
+	
+	</script>
+	
+	</head>
+	<body>
+		<div id="init">
+			<form>
+			<header>
+				<p class="title">Simulador Processador ICMC v1</p>
+				<p>Selecione o arquivo a ser carregado:</p>
+			</header>
+			Mif código: <input type="file" id="source" name="source[]" required accept="text/mif"/><br>
+			Mif charmap: <input type="file" id="charmap" name="charmap[]" required /><br>
+			Restaurar: <input type="checkbox" id="restore" name="restore" value="1">(Restaura o mif anterior. Não recebendo alteração do disco rigido)<br>
+			<button type="button" id="buttonRun">Executar</button>
+			<output id="list"></output>
+			</form>
+		</div>
+		<div id="simulador">
+			<div id = "menu" >
+			</div>
+			<div id = "painel">
+				<label id = "labelR[0]">R0:</label><input class="regs" type="text" id = "r[0]"></input>
+				<label id = "labelR[1]">R1:</label><input class="regs" type="text" id = "r[1]"></input>
+				<label id = "labelR[2]">R2:</label><input class="regs" type="text" id = "r[2]"></input>
+				<label id = "labelR[3]">R3:</label><input class="regs" type="text" id = "r[3]"></input>
+				<label id = "labelR[4]">R4:</label><input class="regs" type="text" id = "r[4]"></input>
+				<label id = "labelR[5]">R5:</label><input class="regs"t ype="text" id = "r[5]"></input>
+				<label id = "labelR[6]">R6:</label><input class="regs" type="text" id = "r[6]"></input>
+				<label id = "labelR[7]">R7:</label><input class="regs" type="text" id = "r[7]"></input>
+				<label id = "labelPC">PC:</label><input class="regs" type="text" id = "PC" readonly></input>
+				<label id = "labelIR">IR:</label><input class="regs" type="text" id = "IR" readonly></input>
+				<label id = "labelSP">SP:</label><input class="regs" type="text" id = "SP" readonly></input>
+				<label id = "labelFR">FR:</label><input type="text" id = "FR" readonly></input>
+				<button type="button" id="buttonNext">Próximo</button></button>
+				<button type="button" id="buttonAutomatico">Automatico</button></button>
+				Clock: <input type="range" name="clockSel" id="clockSel" min="1" max="1000000" value="100000"></input>
+			</div>
+			<div id = "center">
+				<div id = "instrucoes" >
+					<list id = "listinst"></list>
+				</div>
+				<div id = "view">
+					<canvas id="canvas" width="640px" height="480px">
+					
+					</canvas>
+				</div>
+			</div>
+			<div id="footer">
+			<div id="status"></div>
+			<div id="clock"></div>
+			<div id="status"></div>
+			</div>
+			</div>
+	</body
+</html>
