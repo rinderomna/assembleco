@@ -1,27 +1,27 @@
-quadradinhoPosition : var #1
+    quadradinhoPosition : var #1
 
-quadradinho : var #8
-  static quadradinho + #0, #2 ;  se
-  static quadradinho + #1, #1 ;  horizontal
-  static quadradinho + #2, #3 ;  sd
-  ;38  espacos para o proximo caractere
-  static quadradinho + #3, #0 ;  vertical
-  ;2  espacos para o proximo caractere
-  static quadradinho + #4, #0 ;  vertical
-  ;38  espacos para o proximo caractere
-  static quadradinho + #5, #4 ;  ie
-  static quadradinho + #6, #1 ;  horizontal
-  static quadradinho + #7, #5 ;  id
+    quadradinho : var #8
+    static quadradinho + #0, #2 ;   se
+    static quadradinho + #1, #1 ;   horizontal
+    static quadradinho + #2, #3 ;   sd
+    ;38  espacos para o proximo caractere
+    static quadradinho + #3, #0 ;   vertical
+    ;2  espacos para o proximo caractere
+    static quadradinho + #4, #0 ;   vertical
+    ;38  espacos para o proximo caractere
+    static quadradinho + #5, #4 ;   ie
+    static quadradinho + #6, #1 ;   horizontal
+    static quadradinho + #7, #5 ;   id
 
-quadradinhoGaps : var #8
-  static quadradinhoGaps + #0, #0
-  static quadradinhoGaps + #1, #0
-  static quadradinhoGaps + #2, #0
-  static quadradinhoGaps + #3, #37
-  static quadradinhoGaps + #4, #1
-  static quadradinhoGaps + #5, #37
-  static quadradinhoGaps + #6, #0
-  static quadradinhoGaps + #7, #0
+    quadradinhoGaps : var #8
+    static quadradinhoGaps + #0, #0
+    static quadradinhoGaps + #1, #0
+    static quadradinhoGaps + #2, #0
+    static quadradinhoGaps + #3, #37
+    static quadradinhoGaps + #4, #1
+    static quadradinhoGaps + #5, #37
+    static quadradinhoGaps + #6, #0
+    static quadradinhoGaps + #7, #0
 
 printquadradinho:
   push R0

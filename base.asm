@@ -40,6 +40,7 @@ mensagem : string "Digite Algo"
 apaga_mensagem: string "           "
 msg_vitoria: string "venceu!"
 msg_derrota: string "perdeu :("
+msg_resposta: string "A resposta era:"
 
 jmp main
 
@@ -96,9 +97,19 @@ main:
     loadn r0, #0
     cmp r3, r0
     jne nao_derrota
-        loadn r0, #1170
+        loadn r0, #1090
         loadn r1, #msg_derrota
         load r2, Vermelho
+        call Imprimestr
+
+        loadn r0, #1130
+        loadn r1, #msg_resposta
+        load r2, Branco
+        call Imprimestr
+
+        loadn r0, #1170
+        load r1, palavraResposta
+        load r2, Verde
         call Imprimestr
     nao_derrota:
 
@@ -727,17 +738,17 @@ outras_definicoes:
     quadradinhoPosition : var #1
 
     quadradinho : var #8
-    static quadradinho + #0, #2 ;  se
-    static quadradinho + #1, #1 ;  horizontal
-    static quadradinho + #2, #3 ;  sd
+    static quadradinho + #0, #2 ;   se
+    static quadradinho + #1, #1 ;   horizontal
+    static quadradinho + #2, #3 ;   sd
     ;38  espacos para o proximo caractere
-    static quadradinho + #3, #0 ;  vertical
+    static quadradinho + #3, #0 ;   vertical
     ;2  espacos para o proximo caractere
-    static quadradinho + #4, #0 ;  vertical
+    static quadradinho + #4, #0 ;   vertical
     ;38  espacos para o proximo caractere
-    static quadradinho + #5, #4 ;  ie
-    static quadradinho + #6, #1 ;  horizontal
-    static quadradinho + #7, #5 ;  id
+    static quadradinho + #5, #4 ;   ie
+    static quadradinho + #6, #1 ;   horizontal
+    static quadradinho + #7, #5 ;   id
 
     quadradinhoGaps : var #8
     static quadradinhoGaps + #0, #0
