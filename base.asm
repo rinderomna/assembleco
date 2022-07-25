@@ -57,14 +57,20 @@ main:
     call Imprimestr
 
     call printCaixinhas
-
-    loadn r7, #131
-    call lerPalavra
-
-    loadn r1, #palavraChute
-    loadn r7, #131
-    call imprime_com_dicas
     
+    loadn r4, #160 ; constante para pular para próxima linha
+    loadn r3, #6   ; quantidade de repeticoes do loop
+    loadn r7, #131 ; posicao da primeira caixinha da primeira linha
+    main_loop:
+        call lerPalavra
+
+        loadn r1, #palavraChute
+        call imprime_com_dicas
+
+        add r7, r7, r4 ; pos += 160
+    dec r3
+    jnz main_loop
+
 	halt
 
     jmp fim_do_codigo
