@@ -1,38 +1,13 @@
 ;--- ASSEMBLECO ---
 
-Letra: var #1		; Contem a letra que foi digitada
-Rand: var #1        ; Número que será coletado pesualeatoriamente
-quadradinhoPosition : var #1 ; Posicao em que um quadradinho sera impresso
-
+Letra: var #1		    ; Contem a letra que foi digitada
+Rand: var #1            ; Número que será coletado pesualeatoriamente
 palavraResposta: var #1 ; Palavra Resposta do Jogo
 
-; Definindo numero de palavras---
-n_palavras: var #1
-    loadn r0, #1579
-    store n_palavras, r0
-
 jmp outras_definicoes
-fim_outras_definicoes:
+    fim_outras_definicoes:
 
-; --- Guardando Cores na Memoria ---
-    Verde: var #1
-    Vermelho: var #1
-    Amarelo: var #1
-    Branco: var #1
-
-    loadn r0, #512
-    loadn r1, #2304
-    loadn r2, #2816
-    loadn r3, #0
-
-    store Verde, r0
-    store Vermelho, r1 
-    store Amarelo, r2
-    store Branco, r3 
-; --- Fim de Guardar as cores na memória ---
-
-
-; Mensagens ---
+; --- Mensagens ---
 mensagem : string "Digite Algo"
 apaga_mensagem: string "           "
 
@@ -72,6 +47,7 @@ sortearPalavra:
     push R2
 
     load R0, Rand
+
     load R1, n_palavras
     mod R0, R0, R1 ; rand = rand % n_palavras
 
@@ -125,7 +101,6 @@ printCaixinhas:
 
     rts
 
-
 ;********************************************************
 ;                   DIGITE UMA LETRA
 ;********************************************************
@@ -136,14 +111,19 @@ digLetra:	; Espera que uma tecla seja digitada e salva na variavel global "Letra
 	push r1
 	push r2
     push r3
+    push r4
 
 	loadn r1, #255	; Se nao digitar nada vem 255
 	loadn r2, #0	; Logo que programa a FPGA o inchar vem 0
     loadn r3, #0    ; numero aleatorio
 
-   digLetra_Loop:
+    load r4, n_palavras
+
+    digLetra_Loop:
         inc r3
-		inchar r0			; Le o teclado, se nada for digitado = 255
+        mod r3, r3, r4 ; não deixa rand ultrapassar n_palavras
+		
+        inchar r0			; Le o teclado, se nada for digitado = 255
 		cmp r0, r1			;compara r0 com 255
 		jeq digLetra_Loop	; Fica lendo ate' que digite uma tecla valida
 		cmp r0, r2			;compara r0 com 0
@@ -151,14 +131,16 @@ digLetra:	; Espera que uma tecla seja digitada e salva na variavel global "Letra
 
 	store Letra, r0			; Salva a tecla na variavel global "Letra"
 	
-   digLetra_Loop2:
-        inc r3
+    digLetra_Loop2:
 		inchar r0			; Le o teclado, se nada for digitado = 255
 		cmp r0, r1			;compara r0 com 255
 		jne digLetra_Loop2	; Fica lendo ate' que digite uma tecla valida
 	
-    store Rand, r3 ; Retorna um número pseudoaleatorio
+    loadn r2, #0 ; para comparar com 0
 
+    store Rand, r3 ; Retorna um número pseudoaleatorio entre 0 e (n_palavras - 1)
+
+    pop r4
     pop r3
 	pop r2
 	pop r1
@@ -290,3191 +272,3215 @@ apagarquadradinho:
 
 ;-----------------------------------------------------------------------------------------------
 outras_definicoes:
+;; --- Guardando desenho do quadradinho ---
+    quadradinhoPosition : var #1 ; Posicao em que um quadradinho sera impresso
 
-quadradinhoPosition : var #1
+    quadradinho : var #8
+    static quadradinho + #0, #2 ; se
+    static quadradinho + #1, #1 ; horizontal
+    static quadradinho + #2, #3 ; sd
+    ;38  espacos para o proximo caractere
+    static quadradinho + #3, #0 ; vertical
+    ;2  espacos para o proximo caractere
+    static quadradinho + #4, #0 ; vertical
+    ;38  espacos para o proximo caractere
+    static quadradinho + #5, #4 ; ie
+    static quadradinho + #6, #1 ; horizontal
+    static quadradinho + #7, #5 ; id
 
-quadradinho : var #8
-  static quadradinho + #0, #2 ; se
-  static quadradinho + #1, #1 ; horizontal
-  static quadradinho + #2, #3 ; sd
-  ;38  espacos para o proximo caractere
-  static quadradinho + #3, #0 ; vertical
-  ;2  espacos para o proximo caractere
-  static quadradinho + #4, #0 ; vertical
-  ;38  espacos para o proximo caractere
-  static quadradinho + #5, #4 ; ie
-  static quadradinho + #6, #1 ; horizontal
-  static quadradinho + #7, #5 ; id
+    quadradinhoGaps : var #8
+    static quadradinhoGaps + #0, #0
+    static quadradinhoGaps + #1, #0
+    static quadradinhoGaps + #2, #0
+    static quadradinhoGaps + #3, #37
+    static quadradinhoGaps + #4, #1
+    static quadradinhoGaps + #5, #37
+    static quadradinhoGaps + #6, #0
+    static quadradinhoGaps + #7, #0
 
-quadradinhoGaps : var #8
-  static quadradinhoGaps + #0, #0
-  static quadradinhoGaps + #1, #0
-  static quadradinhoGaps + #2, #0
-  static quadradinhoGaps + #3, #37
-  static quadradinhoGaps + #4, #1
-  static quadradinhoGaps + #5, #37
-  static quadradinhoGaps + #6, #0
-  static quadradinhoGaps + #7, #0
+;; --- Guardando Cores na Memoria ---
+    Verde: var #1
+    Vermelho: var #1
+    Amarelo: var #1
+    Branco: var #1
 
-palavras: var #5
-	word0: string "abaco"
-	word1: string "abada"
-	word2: string "abana"
-	word3: string "abril"
-	word4: string "abrir"
-	word5: string "acais"
-	word6: string "acaro"
-	word7: string "acaso"
-	word8: string "aceso"
-	word9: string "achar"
-	word10: string "acido"
-	word11: string "acima"
-	word12: string "acola"
-	word13: string "acres"
-	word14: string "acusa"
-	word15: string "adaga"
-	word16: string "adeus"
-	word17: string "adiar"
-	word18: string "advir"
-	word19: string "afeto"
-	word20: string "afiar"
-	word21: string "afora"
-	word22: string "agape"
-	word23: string "agora"
-	word24: string "aguar"
-	word25: string "aguas"
-	word26: string "aguda"
-	word27: string "agudo"
-	word28: string "ainda"
-	word29: string "aipim"
-	word30: string "aipos"
-	word31: string "alcar"
-	word32: string "alema"
-	word33: string "algas"
-	word34: string "algum"
-	word35: string "alhos"
-	word36: string "aliar"
-	word37: string "alias"
-	word38: string "alibi"
-	word39: string "almas"
-	word40: string "altar"
-	word41: string "altas"
-	word42: string "altos"
-	word43: string "aluno"
-	word44: string "alvor"
-	word45: string "amada"
-	word46: string "amado"
-	word47: string "amago"
-	word48: string "ambar"
-	word49: string "amido"
-	word50: string "amigo"
-	word51: string "amora"
-	word52: string "amplo"
-	word53: string "andar"
-	word54: string "animo"
-	word55: string "anjos"
-	word56: string "anodo"
-	word57: string "anoes"
-	word58: string "ansia"
-	word59: string "antas"
-	word60: string "antro"
-	word61: string "anuir"
-	word62: string "anzol"
-	word63: string "aonde"
-	word64: string "apaga"
-	word65: string "apelo"
-	word66: string "apice"
-	word67: string "apito"
-	word68: string "apoia"
-	word69: string "aqueo"
-	word70: string "arabe"
-	word71: string "arcar"
-	word72: string "arcas"
-	word73: string "arcos"
-	word74: string "arder"
-	word75: string "ardor"
-	word76: string "arear"
-	word77: string "areia"
-	word78: string "arena"
-	word79: string "arfar"
-	word80: string "aries"
-	word81: string "armar"
-	word82: string "arpao"
-	word83: string "arroz"
-	word84: string "artes"
-	word85: string "aspas"
-	word86: string "assar"
-	word87: string "assaz"
-	word88: string "assim"
-	word89: string "atico"
-	word90: string "atomo"
-	word91: string "atono"
-	word92: string "atras"
-	word93: string "atriz"
-	word94: string "atroz"
-	word95: string "atual"
-	word96: string "atuar"
-	word97: string "audio"
-	word98: string "aurea"
-	word99: string "aveia"
-	word100: string "avela"
-	word101: string "aviao"
-	word102: string "avido"
-	word103: string "aviso"
-	word104: string "azedo"
-	word105: string "azuis"
-	word106: string "babar"
-	word107: string "babas"
-	word108: string "bacia"
-	word109: string "bagas"
-	word110: string "bagre"
-	word111: string "bahia"
-	word112: string "baiao"
-	word113: string "baile"
-	word114: string "baixo"
-	word115: string "balao"
-	word116: string "balas"
-	word117: string "balde"
-	word118: string "balir"
-	word119: string "balsa"
-	word120: string "bamba"
-	word121: string "bambi"
-	word122: string "bambo"
-	word123: string "bambu"
-	word124: string "banal"
-	word125: string "banco"
-	word126: string "banda"
-	word127: string "bando"
-	word128: string "banho"
-	word129: string "banir"
-	word130: string "banjo"
-	word131: string "baoba"
-	word132: string "baque"
-	word133: string "barao"
-	word134: string "barba"
-	word135: string "barca"
-	word136: string "barco"
-	word137: string "bario"
-	word138: string "baroa"
-	word139: string "barra"
-	word140: string "barro"
-	word141: string "basal"
-	word142: string "basar"
-	word143: string "basco"
-	word144: string "bater"
-	word145: string "bauru"
-	word146: string "bazar"
-	word147: string "beber"
-	word148: string "bebes"
-	word149: string "bebum"
-	word150: string "beico"
-	word151: string "beijo"
-	word152: string "beira"
-	word153: string "belas"
-	word154: string "belem"
-	word155: string "belga"
-	word156: string "belos"
-	word157: string "bemol"
-	word158: string "bento"
-	word159: string "berbe"
-	word160: string "berco"
-	word161: string "berro"
-	word162: string "besta"
-	word163: string "betim"
-	word164: string "bicar"
-	word165: string "bicha"
-	word166: string "bicho"
-	word167: string "biela"
-	word168: string "bimba"
-	word169: string "bioma"
-	word170: string "biose"
-	word171: string "biota"
-	word172: string "bispo"
-	word173: string "bloco"
-	word174: string "blusa"
-	word175: string "bobao"
-	word176: string "bobos"
-	word177: string "bocal"
-	word178: string "bocas"
-	word179: string "bocel"
-	word180: string "bodar"
-	word181: string "bodes"
-	word182: string "boiar"
-	word183: string "boias"
-	word184: string "boina"
-	word185: string "bolao"
-	word186: string "bolar"
-	word187: string "bolas"
-	word188: string "boldo"
-	word189: string "bolha"
-	word190: string "bolor"
-	word191: string "bolos"
-	word192: string "bolsa"
-	word193: string "bolsa"
-	word194: string "bomba"
-	word195: string "bonar"
-	word196: string "bonde"
-	word197: string "bones"
-	word198: string "bonus"
-	word199: string "borda"
-	word200: string "bordo"
-	word201: string "borel"
-	word202: string "borra"
-	word203: string "bosco"
-	word204: string "boson"
-	word205: string "bossa"
-	word206: string "bosta"
-	word207: string "botar"
-	word208: string "botas"
-	word209: string "botim"
-	word210: string "botos"
-	word211: string "botox"
-	word212: string "bouba"
-	word213: string "bouda"
-	word214: string "braco"
-	word215: string "brasa"
-	word216: string "bravo"
-	word217: string "brear"
-	word218: string "breca"
-	word219: string "brega"
-	word220: string "brejo"
-	word221: string "breus"
-	word222: string "breve"
-	word223: string "briga"
-	word224: string "brisa"
-	word225: string "brita"
-	word226: string "broca"
-	word227: string "bromo"
-	word228: string "brumo"
-	word229: string "bruto"
-	word230: string "bruxa"
-	word231: string "bucal"
-	word232: string "bucha"
-	word233: string "bucho"
-	word234: string "bufar"
-	word235: string "bugio"
-	word236: string "bugre"
-	word237: string "bujao"
-	word238: string "bulbo"
-	word239: string "bules"
-	word240: string "bulir"
-	word241: string "bunda"
-	word242: string "burro"
-	word243: string "busca"
-	word244: string "busso"
-	word245: string "busto"
-	word246: string "buzio"
-	word247: string "cabal"
-	word248: string "caber"
-	word249: string "cabos"
-	word250: string "cabra"
-	word251: string "cacao"
-	word252: string "cacar"
-	word253: string "cacas"
-	word254: string "cacau"
-	word255: string "cache"
-	word256: string "cacho"
-	word257: string "caciz"
-	word258: string "cacos"
-	word259: string "cacto"
-	word260: string "cafes"
-	word261: string "cafta"
-	word262: string "cagar"
-	word263: string "cairo"
-	word264: string "cairu"
-	word265: string "caixa"
-	word266: string "cajas"
-	word267: string "cajus"
-	word268: string "calao"
-	word269: string "calar"
-	word270: string "calca"
-	word271: string "calco"
-	word272: string "caldo"
-	word273: string "calos"
-	word274: string "calvo"
-	word275: string "camas"
-	word276: string "campo"
-	word277: string "canal"
-	word278: string "canas"
-	word279: string "canil"
-	word280: string "canoa"
-	word281: string "canto"
-	word282: string "capas"
-	word283: string "capaz"
-	word284: string "capim"
-	word285: string "capuz"
-	word286: string "caqui"
-	word287: string "caras"
-	word288: string "carga"
-	word289: string "carie"
-	word290: string "carmo"
-	word291: string "carne"
-	word292: string "carne"
-	word293: string "caros"
-	word294: string "carro"
-	word295: string "carta"
-	word296: string "casal"
-	word297: string "casao"
-	word298: string "casar"
-	word299: string "casas"
-	word300: string "casca"
-	word301: string "casco"
-	word302: string "casos"
-	word303: string "caspa"
-	word304: string "casta"
-	word305: string "casto"
-	word306: string "catar"
-	word307: string "cauda"
-	word308: string "caule"
-	word309: string "causa"
-	word310: string "cavar"
-	word311: string "ceara"
-	word312: string "ceder"
-	word313: string "cedro"
-	word314: string "cegar"
-	word315: string "cegos"
-	word316: string "ceita"
-	word317: string "censo"
-	word318: string "cento"
-	word319: string "cerar"
-	word320: string "ceras"
-	word321: string "cerca"
-	word322: string "cerdo"
-	word323: string "cerne"
-	word324: string "cerol"
-	word325: string "cervo"
-	word326: string "cesta"
-	word327: string "cesto"
-	word328: string "cetim"
-	word329: string "cetro"
-	word330: string "chaga"
-	word331: string "chale"
-	word332: string "chama"
-	word333: string "chaos"
-	word334: string "chapa"
-	word335: string "chato"
-	word336: string "chave"
-	word337: string "chefe"
-	word338: string "cheio"
-	word339: string "chile"
-	word340: string "china"
-	word341: string "choco"
-	word342: string "chule"
-	word343: string "chuva"
-	word344: string "ciano"
-	word345: string "ciclo"
-	word346: string "cidra"
-	word347: string "cilio"
-	word348: string "cinza"
-	word349: string "cipos"
-	word350: string "circo"
-	word351: string "cisao"
-	word352: string "cisco"
-	word353: string "cisma"
-	word354: string "cisne"
-	word355: string "citar"
-	word356: string "ciume"
-	word357: string "civis"
-	word358: string "clara"
-	word359: string "claro"
-	word360: string "clava"
-	word361: string "clero"
-	word362: string "clima"
-	word363: string "clipe"
-	word364: string "clone"
-	word365: string "cloro"
-	word366: string "clube"
-	word367: string "cobre"
-	word368: string "cocar"
-	word369: string "cocos"
-	word370: string "codon"
-	word371: string "coeso"
-	word372: string "cofre"
-	word373: string "cohab"
-	word374: string "coice"
-	word375: string "coifa"
-	word376: string "coisa"
-	word377: string "coito"
-	word378: string "colar"
-	word379: string "colas"
-	word380: string "colon"
-	word381: string "colos"
-	word382: string "combe"
-	word383: string "combo"
-	word384: string "comer"
-	word385: string "comum"
-	word386: string "conde"
-	word387: string "congo"
-	word388: string "conta"
-	word389: string "conto"
-	word390: string "copas"
-	word391: string "copos"
-	word392: string "coral"
-	word393: string "corar"
-	word394: string "corda"
-	word395: string "cores"
-	word396: string "corgo"
-	word397: string "corno"
-	word398: string "coroa"
-	word399: string "coroa"
-	word400: string "corpo"
-	word401: string "corte"
-	word402: string "corvo"
-	word403: string "coser"
-	word404: string "cosmo"
-	word405: string "cospe"
-	word406: string "costa"
-	word407: string "cotas"
-	word408: string "couve"
-	word409: string "covas"
-	word410: string "covil"
-	word411: string "coxas"
-	word412: string "coxos"
-	word413: string "cravo"
-	word414: string "credo"
-	word415: string "creme"
-	word416: string "crepe"
-	word417: string "creta"
-	word418: string "criar"
-	word419: string "crime"
-	word420: string "crina"
-	word421: string "crise"
-	word422: string "crivo"
-	word423: string "cruel"
-	word424: string "cubos"
-	word425: string "cucas"
-	word426: string "cueca"
-	word427: string "culpa"
-	word428: string "culto"
-	word429: string "cunha"
-	word430: string "cunho"
-	word431: string "cupim"
-	word432: string "cupio"
-	word433: string "cupom"
-	word434: string "curar"
-	word435: string "curas"
-	word436: string "curau"
-	word437: string "curso"
-	word438: string "curto"
-	word439: string "curva"
-	word440: string "curvo"
-	word441: string "cuspe"
-	word442: string "custo"
-	word443: string "cutia"
-	word444: string "dados"
-	word445: string "damas"
-	word446: string "danar"
-	word447: string "danca"
-	word448: string "daqui"
-	word449: string "datar"
-	word450: string "datas"
-	word451: string "debil"
-	word452: string "dedos"
-	word453: string "delta"
-	word454: string "dengo"
-	word455: string "denso"
-	word456: string "dente"
-	word457: string "depor"
-	word458: string "derme"
-	word459: string "desce"
-	word460: string "deter"
-	word461: string "deusa"
-	word462: string "dever"
-	word463: string "devir"
-	word464: string "diabo"
-	word465: string "dicas"
-	word466: string "digno"
-	word467: string "disco"
-	word468: string "ditos"
-	word469: string "dizer"
-	word470: string "dobro"
-	word471: string "doces"
-	word472: string "docil"
-	word473: string "dogma"
-	word474: string "doido"
-	word475: string "dolar"
-	word476: string "domar"
-	word477: string "donas"
-	word478: string "donos"
-	word479: string "dopar"
-	word480: string "dores"
-	word481: string "dorso"
-	word482: string "dosar"
-	word483: string "doses"
-	word484: string "dotar"
-	word485: string "draga"
-	word486: string "drama"
-	word487: string "duble"
-	word488: string "ducto"
-	word489: string "duelo"
-	word490: string "dueto"
-	word491: string "dunas"
-	word492: string "duplo"
-	word493: string "duque"
-	word494: string "durar"
-	word495: string "duras"
-	word496: string "duzia"
-	word497: string "ebrio"
-	word498: string "ecoar"
-	word499: string "edema"
-	word500: string "egito"
-	word501: string "eixos"
-	word502: string "enfim"
-	word503: string "entao"
-	word504: string "entre"
-	word505: string "epico"
-	word506: string "epoca"
-	word507: string "errar"
-	word508: string "erros"
-	word509: string "ervas"
-	word510: string "estar"
-	word511: string "etapa"
-	word512: string "etico"
-	word513: string "etnia"
-	word514: string "exame"
-	word515: string "exato"
-	word516: string "exito"
-	word517: string "expor"
-	word518: string "extra"
-	word519: string "facao"
-	word520: string "facas"
-	word521: string "faces"
-	word522: string "facil"
-	word523: string "fadar"
-	word524: string "fadas"
-	word525: string "faixa"
-	word526: string "falar"
-	word527: string "falha"
-	word528: string "falir"
-	word529: string "falso"
-	word530: string "fanho"
-	word531: string "farao"
-	word532: string "farda"
-	word533: string "farol"
-	word534: string "farsa"
-	word535: string "farta"
-	word536: string "fasor"
-	word537: string "fatal"
-	word538: string "fatia"
-	word539: string "fator"
-	word540: string "fatos"
-	word541: string "faula"
-	word542: string "fauno"
-	word543: string "favas"
-	word544: string "favor"
-	word545: string "fazer"
-	word546: string "febre"
-	word547: string "fecal"
-	word548: string "fecho"
-	word549: string "feder"
-	word550: string "fedor"
-	word551: string "feias"
-	word552: string "feios"
-	word553: string "feira"
-	word554: string "feito"
-	word555: string "feixe"
-	word556: string "femea"
-	word557: string "femur"
-	word558: string "feras"
-	word559: string "ferir"
-	word560: string "feroz"
-	word561: string "ferpa"
-	word562: string "ferro"
-	word563: string "festa"
-	word564: string "fetal"
-	word565: string "fetos"
-	word566: string "feudo"
-	word567: string "fibra"
-	word568: string "ficar"
-	word569: string "filho"
-	word570: string "final"
-	word571: string "finar"
-	word572: string "finas"
-	word573: string "finca"
-	word574: string "finda"
-	word575: string "findo"
-	word576: string "firma"
-	word577: string "fitar"
-	word578: string "fitas"
-	word579: string "fixar"
-	word580: string "fixos"
-	word581: string "flama"
-	word582: string "flavo"
-	word583: string "floco"
-	word584: string "flora"
-	word585: string "fluir"
-	word586: string "fluor"
-	word587: string "fluxo"
-	word588: string "fobia"
-	word589: string "focal"
-	word590: string "focar"
-	word591: string "focas"
-	word592: string "focos"
-	word593: string "fofos"
-	word594: string "fogao"
-	word595: string "fogos"
-	word596: string "foice"
-	word597: string "folha"
-	word598: string "folia"
-	word599: string "fomes"
-	word600: string "fonte"
-	word601: string "forca"
-	word602: string "forca"
-	word603: string "forma"
-	word604: string "forno"
-	word605: string "forra"
-	word606: string "forro"
-	word607: string "forte"
-	word608: string "forum"
-	word609: string "fosco"
-	word610: string "fossa"
-	word611: string "fosso"
-	word612: string "fotos"
-	word613: string "fraco"
-	word614: string "frase"
-	word615: string "frear"
-	word616: string "freio"
-	word617: string "fresa"
-	word618: string "frete"
-	word619: string "frevo"
-	word620: string "frias"
-	word621: string "friez"
-	word622: string "frios"
-	word623: string "frita"
-	word624: string "frito"
-	word625: string "frota"
-	word626: string "fruta"
-	word627: string "fruto"
-	word628: string "fugaz"
-	word629: string "fugir"
-	word630: string "fumar"
-	word631: string "fumos"
-	word632: string "fundo"
-	word633: string "fungo"
-	word634: string "funil"
-	word635: string "furar"
-	word636: string "furia"
-	word637: string "furor"
-	word638: string "furos"
-	word639: string "fusao"
-	word640: string "fusil"
-	word641: string "fusos"
-	word642: string "futil"
-	word643: string "fuzil"
-	word644: string "fuzis"
-	word645: string "gabar"
-	word646: string "galho"
-	word647: string "galos"
-	word648: string "gamao"
-	word649: string "gamar"
-	word650: string "gamba"
-	word651: string "ganho"
-	word652: string "ganir"
-	word653: string "ganso"
-	word654: string "garbo"
-	word655: string "garca"
-	word656: string "garra"
-	word657: string "gases"
-	word658: string "gasto"
-	word659: string "gatos"
-	word660: string "geada"
-	word661: string "gelos"
-	word662: string "gemas"
-	word663: string "gemeo"
-	word664: string "gemer"
-	word665: string "genio"
-	word666: string "genro"
-	word667: string "gente"
-	word668: string "geral"
-	word669: string "gerar"
-	word670: string "germe"
-	word671: string "gesso"
-	word672: string "gesto"
-	word673: string "girar"
-	word674: string "giros"
-	word675: string "glace"
-	word676: string "globo"
-	word677: string "glote"
-	word678: string "gnomo"
-	word679: string "goela"
-	word680: string "goias"
-	word681: string "golas"
-	word682: string "golfo"
-	word683: string "golpe"
-	word684: string "gomas"
-	word685: string "gordo"
-	word686: string "gosma"
-	word687: string "gosto"
-	word688: string "graal"
-	word689: string "graca"
-	word690: string "grade"
-	word691: string "grafo"
-	word692: string "grama"
-	word693: string "graos"
-	word694: string "grato"
-	word695: string "grave"
-	word696: string "graxa"
-	word697: string "grego"
-	word698: string "greve"
-	word699: string "grilo"
-	word700: string "grude"
-	word701: string "grupo"
-	word702: string "gruta"
-	word703: string "guiar"
-	word704: string "guias"
-	word705: string "habil"
-	word706: string "hagar"
-	word707: string "harem"
-	word708: string "haste"
-	word709: string "helio"
-	word710: string "heras"
-	word711: string "heroi"
-	word712: string "hiato"
-	word713: string "hidra"
-	word714: string "hiena"
-	word715: string "hifen"
-	word716: string "himen"
-	word717: string "homem"
-	word718: string "honra"
-	word719: string "horas"
-	word720: string "horda"
-	word721: string "horta"
-	word722: string "hotel"
-	word723: string "hulha"
-	word724: string "humor"
-	word725: string "humus"
-	word726: string "icone"
-	word727: string "idear"
-	word728: string "ideia"
-	word729: string "idolo"
-	word730: string "igneo"
-	word731: string "igual"
-	word732: string "ileso"
-	word733: string "ilhas"
-	word734: string "impar"
-	word735: string "impio"
-	word736: string "impor"
-	word737: string "imune"
-	word738: string "index"
-	word739: string "india"
-	word740: string "indio"
-	word741: string "inves"
-	word742: string "irmao"
-	word743: string "irmas"
-	word744: string "iscas"
-	word745: string "jacas"
-	word746: string "jambo"
-	word747: string "jambu"
-	word748: string "janio"
-	word749: string "japao"
-	word750: string "jarro"
-	word751: string "jatos"
-	word752: string "jaula"
-	word753: string "jazer"
-	word754: string "jeito"
-	word755: string "jejum"
-	word756: string "jesus"
-	word757: string "jogar"
-	word758: string "jogos"
-	word759: string "joias"
-	word760: string "jotas"
-	word761: string "jovem"
-	word762: string "judeu"
-	word763: string "judia"
-	word764: string "juiza"
-	word765: string "juizo"
-	word766: string "julho"
-	word767: string "jumbo"
-	word768: string "junho"
-	word769: string "junia"
-	word770: string "jurar"
-	word771: string "justa"
-	word772: string "labio"
-	word773: string "labor"
-	word774: string "lacar"
-	word775: string "lacre"
-	word776: string "lagoa"
-	word777: string "lagos"
-	word778: string "laico"
-	word779: string "lamas"
-	word780: string "lambe"
-	word781: string "lanca"
-	word782: string "lapas"
-	word783: string "lapis"
-	word784: string "lapso"
-	word785: string "laque"
-	word786: string "largo"
-	word787: string "larva"
-	word788: string "lasca"
-	word789: string "latao"
-	word790: string "latas"
-	word791: string "latex"
-	word792: string "latim"
-	word793: string "latir"
-	word794: string "lauda"
-	word795: string "laudo"
-	word796: string "lavar"
-	word797: string "lavra"
-	word798: string "lazer"
-	word799: string "leais"
-	word800: string "lebre"
-	word801: string "legal"
-	word802: string "legua"
-	word803: string "leite"
-	word804: string "leito"
-	word805: string "lenco"
-	word806: string "lenha"
-	word807: string "lento"
-	word808: string "leoas"
-	word809: string "leoes"
-	word810: string "lepra"
-	word811: string "leque"
-	word812: string "lerdo"
-	word813: string "lesao"
-	word814: string "lesar"
-	word815: string "lesma"
-	word816: string "leste"
-	word817: string "letal"
-	word818: string "letra"
-	word819: string "levar"
-	word820: string "leves"
-	word821: string "lhama"
-	word822: string "liame"
-	word823: string "libra"
-	word824: string "licao"
-	word825: string "licor"
-	word826: string "lidar"
-	word827: string "lider"
-	word828: string "ligar"
-	word829: string "ligas"
-	word830: string "lilas"
-	word831: string "limao"
-	word832: string "limar"
-	word833: string "limas"
-	word834: string "limbo"
-	word835: string "limpo"
-	word836: string "lince"
-	word837: string "lindo"
-	word838: string "linha"
-	word839: string "linho"
-	word840: string "lirio"
-	word841: string "lisos"
-	word842: string "lista"
-	word843: string "litio"
-	word844: string "litro"
-	word845: string "livre"
-	word846: string "livro"
-	word847: string "lixao"
-	word848: string "lixar"
-	word849: string "lixas"
-	word850: string "lixos"
-	word851: string "lobos"
-	word852: string "local"
-	word853: string "locao"
-	word854: string "locar"
-	word855: string "lombo"
-	word856: string "lonas"
-	word857: string "longe"
-	word858: string "longo"
-	word859: string "lotar"
-	word860: string "lotus"
-	word861: string "louca"
-	word862: string "louco"
-	word863: string "louro"
-	word864: string "lousa"
-	word865: string "lucro"
-	word866: string "lugar"
-	word867: string "lulas"
-	word868: string "lunar"
-	word869: string "lutar"
-	word870: string "luvas"
-	word871: string "luxar"
-	word872: string "luxos"
-	word873: string "macas"
-	word874: string "macho"
-	word875: string "macio"
-	word876: string "macom"
-	word877: string "macos"
-	word878: string "madre"
-	word879: string "magma"
-	word880: string "magna"
-	word881: string "magoa"
-	word882: string "magro"
-	word883: string "maior"
-	word884: string "major"
-	word885: string "malas"
-	word886: string "malha"
-	word887: string "malta"
-	word888: string "mamae"
-	word889: string "mamao"
-	word890: string "mamar"
-	word891: string "mamas"
-	word892: string "manca"
-	word893: string "manga"
-	word894: string "manha"
-	word895: string "mania"
-	word896: string "manso"
-	word897: string "manta"
-	word898: string "manto"
-	word899: string "mapas"
-	word900: string "marca"
-	word901: string "marco"
-	word902: string "marco"
-	word903: string "mares"
-	word904: string "marte"
-	word905: string "massa"
-	word906: string "matar"
-	word907: string "matiz"
-	word908: string "matos"
-	word909: string "mecha"
-	word910: string "media"
-	word911: string "medio"
-	word912: string "medir"
-	word913: string "meias"
-	word914: string "meigo"
-	word915: string "meios"
-	word916: string "melao"
-	word917: string "melar"
-	word918: string "menor"
-	word919: string "menos"
-	word920: string "menta"
-	word921: string "merce"
-	word922: string "merda"
-	word923: string "meros"
-	word924: string "mesas"
-	word925: string "meses"
-	word926: string "mesmo"
-	word927: string "meter"
-	word928: string "metro"
-	word929: string "metro"
-	word930: string "mexer"
-	word931: string "midia"
-	word932: string "mijar"
-	word933: string "mijos"
-	word934: string "milho"
-	word935: string "mimar"
-	word936: string "minar"
-	word937: string "minas"
-	word938: string "minha"
-	word939: string "miolo"
-	word940: string "miope"
-	word941: string "mirar"
-	word942: string "miras"
-	word943: string "mirim"
-	word944: string "misto"
-	word945: string "miudo"
-	word946: string "mocas"
-	word947: string "modas"
-	word948: string "modos"
-	word949: string "moeda"
-	word950: string "moela"
-	word951: string "mofar"
-	word952: string "mofos"
-	word953: string "mogno"
-	word954: string "moita"
-	word955: string "molar"
-	word956: string "molas"
-	word957: string "molde"
-	word958: string "moles"
-	word959: string "molho"
-	word960: string "monja"
-	word961: string "morar"
-	word962: string "morro"
-	word963: string "morta"
-	word964: string "morte"
-	word965: string "morto"
-	word966: string "mosca"
-	word967: string "motel"
-	word968: string "motim"
-	word969: string "motor"
-	word970: string "motos"
-	word971: string "movel"
-	word972: string "mover"
-	word973: string "mudar"
-	word974: string "mudas"
-	word975: string "mudez"
-	word976: string "mudos"
-	word977: string "multa"
-	word978: string "mumia"
-	word979: string "mundo"
-	word980: string "munir"
-	word981: string "mural"
-	word982: string "muros"
-	word983: string "murro"
-	word984: string "musas"
-	word985: string "museu"
-	word986: string "nabos"
-	word987: string "nacao"
-	word988: string "nadar"
-	word989: string "nariz"
-	word990: string "nasal"
-	word991: string "natal"
-	word992: string "natas"
-	word993: string "naval"
-	word994: string "negar"
-	word995: string "negro"
-	word996: string "nepal"
-	word997: string "nervo"
-	word998: string "nevar"
-	word999: string "neves"
-	word1000: string "ninfa"
-	word1001: string "ninho"
-	word1002: string "ninja"
-	word1003: string "nobre"
-	word1004: string "nocao"
-	word1005: string "nodal"
-	word1006: string "nodos"
-	word1007: string "noivo"
-	word1008: string "nonos"
-	word1009: string "norte"
-	word1010: string "nosso"
-	word1011: string "notar"
-	word1012: string "notas"
-	word1013: string "novos"
-	word1014: string "nozes"
-	word1015: string "nudez"
-	word1016: string "nunca"
-	word1017: string "nuvem"
-	word1018: string "oasis"
-	word1019: string "obito"
-	word1020: string "obras"
-	word1021: string "obter"
-	word1022: string "obvio"
-	word1023: string "octal"
-	word1024: string "oculo"
-	word1025: string "odiar"
-	word1026: string "ofuro"
-	word1027: string "olhar"
-	word1028: string "olhos"
-	word1029: string "oliva"
-	word1030: string "ombro"
-	word1031: string "omega"
-	word1032: string "oncas"
-	word1033: string "ondas"
-	word1034: string "opaco"
-	word1035: string "opcao"
-	word1036: string "opera"
-	word1037: string "optar"
-	word1038: string "orfao"
-	word1039: string "ornar"
-	word1040: string "osseo"
-	word1041: string "ossos"
-	word1042: string "ostra"
-	word1043: string "otimo"
-	word1044: string "ouros"
-	word1045: string "ousar"
-	word1046: string "outro"
-	word1047: string "ouvir"
-	word1048: string "ovino"
-	word1049: string "ovulo"
-	word1050: string "oxido"
-	word1051: string "padre"
-	word1052: string "pagao"
-	word1053: string "pagar"
-	word1054: string "pagos"
-	word1055: string "paiol"
-	word1056: string "pajem"
-	word1057: string "pajes"
-	word1058: string "palco"
-	word1059: string "palha"
-	word1060: string "palma"
-	word1061: string "panda"
-	word1062: string "papar"
-	word1063: string "papel"
-	word1064: string "papos"
-	word1065: string "parar"
-	word1066: string "pardo"
-	word1067: string "pareo"
-	word1068: string "pares"
-	word1069: string "parir"
-	word1070: string "parte"
-	word1071: string "parto"
-	word1072: string "parvo"
-	word1073: string "passo"
-	word1074: string "pasto"
-	word1075: string "patas"
-	word1076: string "patio"
-	word1077: string "patos"
-	word1078: string "pavao"
-	word1079: string "pavio"
-	word1080: string "pavoa"
-	word1081: string "pavor"
-	word1082: string "pecar"
-	word1083: string "pecas"
-	word1084: string "pedal"
-	word1085: string "pedir"
-	word1086: string "pedra"
-	word1087: string "pegar"
-	word1088: string "peido"
-	word1089: string "peito"
-	word1090: string "peixe"
-	word1091: string "peles"
-	word1092: string "pelos"
-	word1093: string "pelve"
-	word1094: string "penal"
-	word1095: string "penar"
-	word1096: string "penas"
-	word1097: string "penca"
-	word1098: string "pente"
-	word1099: string "peoes"
-	word1100: string "pepel"
-	word1101: string "pequi"
-	word1102: string "peras"
-	word1103: string "perca"
-	word1104: string "perna"
-	word1105: string "persa"
-	word1106: string "perto"
-	word1107: string "perua"
-	word1108: string "pesar"
-	word1109: string "pesca"
-	word1110: string "pesos"
-	word1111: string "peste"
-	word1112: string "pifar"
-	word1113: string "pifio"
-	word1114: string "pilha"
-	word1115: string "pinar"
-	word1116: string "pingo"
-	word1117: string "pinha"
-	word1118: string "pinho"
-	word1119: string "pinos"
-	word1120: string "pinta"
-	word1121: string "pinto"
-	word1122: string "pioes"
-	word1123: string "pipas"
-	word1124: string "pirar"
-	word1125: string "piris"
-	word1126: string "pisar"
-	word1127: string "pisca"
-	word1128: string "pisos"
-	word1129: string "placa"
-	word1130: string "plano"
-	word1131: string "plato"
-	word1132: string "plebe"
-	word1133: string "pleno"
-	word1134: string "pluma"
-	word1135: string "pneus"
-	word1136: string "pobre"
-	word1137: string "pocos"
-	word1138: string "podar"
-	word1139: string "poder"
-	word1140: string "podio"
-	word1141: string "podre"
-	word1142: string "poema"
-	word1143: string "poeta"
-	word1144: string "polen"
-	word1145: string "polir"
-	word1146: string "polos"
-	word1147: string "polvo"
-	word1148: string "pomar"
-	word1149: string "pomba"
-	word1150: string "pombo"
-	word1151: string "ponei"
-	word1152: string "ponta"
-	word1153: string "ponte"
-	word1154: string "ponto"
-	word1155: string "porco"
-	word1156: string "porta"
-	word1157: string "porto"
-	word1158: string "posar"
-	word1159: string "posto"
-	word1160: string "potro"
-	word1161: string "pouco"
-	word1162: string "poupa"
-	word1163: string "povos"
-	word1164: string "praca"
-	word1165: string "praga"
-	word1166: string "praia"
-	word1167: string "prata"
-	word1168: string "prato"
-	word1169: string "prazo"
-	word1170: string "prece"
-	word1171: string "preco"
-	word1172: string "prego"
-	word1173: string "preso"
-	word1174: string "preto"
-	word1175: string "primo"
-	word1176: string "prior"
-	word1177: string "prole"
-	word1178: string "prosa"
-	word1179: string "pudim"
-	word1180: string "pudor"
-	word1181: string "pular"
-	word1182: string "pulga"
-	word1183: string "pulos"
-	word1184: string "punho"
-	word1185: string "punir"
-	word1186: string "puros"
-	word1187: string "puxar"
-	word1188: string "quase"
-	word1189: string "queda"
-	word1190: string "quibe"
-	word1191: string "quimo"
-	word1192: string "quina"
-	word1193: string "rabos"
-	word1194: string "racao"
-	word1195: string "radar"
-	word1196: string "radio"
-	word1197: string "raias"
-	word1198: string "raios"
-	word1199: string "raiva"
-	word1200: string "rajar"
-	word1201: string "ralar"
-	word1202: string "ralos"
-	word1203: string "ramal"
-	word1204: string "ramas"
-	word1205: string "ramos"
-	word1206: string "rampa"
-	word1207: string "ranho"
-	word1208: string "rapaz"
-	word1209: string "rapel"
-	word1210: string "raque"
-	word1211: string "raros"
-	word1212: string "rasos"
-	word1213: string "raspa"
-	word1214: string "ratos"
-	word1215: string "razao"
-	word1216: string "reais"
-	word1217: string "recem"
-	word1218: string "redes"
-	word1219: string "refem"
-	word1220: string "regar"
-	word1221: string "regio"
-	word1222: string "regra"
-	word1223: string "regua"
-	word1224: string "relar"
-	word1225: string "relva"
-	word1226: string "remar"
-	word1227: string "renal"
-	word1228: string "renda"
-	word1229: string "resto"
-	word1230: string "retos"
-	word1231: string "retro"
-	word1232: string "reuma"
-	word1233: string "reves"
-	word1234: string "revoa"
-	word1235: string "rezar"
-	word1236: string "ricos"
-	word1237: string "rifar"
-	word1238: string "rijos"
-	word1239: string "rimar"
-	word1240: string "rimas"
-	word1241: string "rixas"
-	word1242: string "robos"
-	word1243: string "rocar"
-	word1244: string "rocas"
-	word1245: string "rocha"
-	word1246: string "rodar"
-	word1247: string "rodas"
-	word1248: string "rodos"
-	word1249: string "rogar"
-	word1250: string "rojao"
-	word1251: string "rolar"
-	word1252: string "rolha"
-	word1253: string "romas"
-	word1254: string "rombo"
-	word1255: string "romeu"
-	word1256: string "ronda"
-	word1257: string "rosal"
-	word1258: string "rosas"
-	word1259: string "rosca"
-	word1260: string "rosto"
-	word1261: string "rotas"
-	word1262: string "rotor"
-	word1263: string "rouco"
-	word1264: string "roupa"
-	word1265: string "roxos"
-	word1266: string "rubor"
-	word1267: string "rubro"
-	word1268: string "rubro"
-	word1269: string "rudez"
-	word1270: string "ruela"
-	word1271: string "rufar"
-	word1272: string "rufos"
-	word1273: string "rugir"
-	word1274: string "ruina"
-	word1275: string "ruins"
-	word1276: string "ruivo"
-	word1277: string "rumar"
-	word1278: string "rumor"
-	word1279: string "rural"
-	word1280: string "russo"
-	word1281: string "saara"
-	word1282: string "sabao"
-	word1283: string "saber"
-	word1284: string "sabio"
-	word1285: string "sabor"
-	word1286: string "sabre"
-	word1287: string "sacar"
-	word1288: string "sacas"
-	word1289: string "sache"
-	word1290: string "sacos"
-	word1291: string "sacro"
-	word1292: string "sadio"
-	word1293: string "safar"
-	word1294: string "sagaz"
-	word1295: string "sagui"
-	word1296: string "saias"
-	word1297: string "saida"
-	word1298: string "salao"
-	word1299: string "salas"
-	word1300: string "salmo"
-	word1301: string "salsa"
-	word1302: string "salto"
-	word1303: string "salvo"
-	word1304: string "samba"
-	word1305: string "santo"
-	word1306: string "sapos"
-	word1307: string "sarar"
-	word1308: string "sarau"
-	word1309: string "sarda"
-	word1310: string "sarna"
-	word1311: string "saude"
-	word1312: string "sauna"
-	word1313: string "sebos"
-	word1314: string "secar"
-	word1315: string "secos"
-	word1316: string "secto"
-	word1317: string "sedar"
-	word1318: string "sedas"
-	word1319: string "seios"
-	word1320: string "seita"
-	word1321: string "seiva"
-	word1322: string "seixo"
-	word1323: string "selar"
-	word1324: string "selim"
-	word1325: string "selos"
-	word1326: string "selva"
-	word1327: string "semen"
-	word1328: string "senda"
-	word1329: string "senil"
-	word1330: string "senso"
-	word1331: string "serio"
-	word1332: string "serra"
-	word1333: string "setor"
-	word1334: string "sexos"
-	word1335: string "sexta"
-	word1336: string "sidra"
-	word1337: string "sifao"
-	word1338: string "sigma"
-	word1339: string "signo"
-	word1340: string "silvo"
-	word1341: string "sinal"
-	word1342: string "sinos"
-	word1343: string "siria"
-	word1344: string "sirio"
-	word1345: string "siris"
-	word1346: string "sisos"
-	word1347: string "sisto"
-	word1348: string "sitio"
-	word1349: string "sobre"
-	word1350: string "socar"
-	word1351: string "socio"
-	word1352: string "socos"
-	word1353: string "sodio"
-	word1354: string "sofas"
-	word1355: string "sogro"
-	word1356: string "sojas"
-	word1357: string "solas"
-	word1358: string "solda"
-	word1359: string "solos"
-	word1360: string "solta"
-	word1361: string "somar"
-	word1362: string "sonar"
-	word1363: string "sonda"
-	word1364: string "sonos"
-	word1365: string "sonso"
-	word1366: string "sopra"
-	word1367: string "soros"
-	word1368: string "sorte"
-	word1369: string "sosia"
-	word1370: string "sosso"
-	word1371: string "sotao"
-	word1372: string "sovar"
-	word1373: string "suave"
-	word1374: string "subir"
-	word1375: string "sucos"
-	word1376: string "sueco"
-	word1377: string "suica"
-	word1378: string "suico"
-	word1379: string "suino"
-	word1380: string "suite"
-	word1381: string "sujar"
-	word1382: string "sujos"
-	word1383: string "sulao"
-	word1384: string "sumos"
-	word1385: string "super"
-	word1386: string "surdo"
-	word1387: string "sutia"
-	word1388: string "sutil"
-	word1389: string "tabua"
-	word1390: string "tacar"
-	word1391: string "tacas"
-	word1392: string "tacos"
-	word1393: string "taiga"
-	word1394: string "talco"
-	word1395: string "tanto"
-	word1396: string "tapar"
-	word1397: string "tarar"
-	word1398: string "tarde"
-	word1399: string "tatus"
-	word1400: string "taxar"
-	word1401: string "tecer"
-	word1402: string "tedio"
-	word1403: string "telha"
-	word1404: string "telas"
-	word1405: string "temas"
-	word1406: string "temor"
-	word1407: string "tempo"
-	word1408: string "tenaz"
-	word1409: string "tenda"
-	word1410: string "tenor"
-	word1411: string "tenro"
-	word1412: string "tenso"
-	word1413: string "tenue"
-	word1414: string "terca"
-	word1415: string "terco"
-	word1416: string "terra"
-	word1417: string "testa"
-	word1418: string "tetas"
-	word1419: string "tetos"
-	word1420: string "texto"
-	word1421: string "tigre"
-	word1422: string "timao"
-	word1423: string "times"
-	word1424: string "tinir"
-	word1425: string "tinta"
-	word1426: string "tinto"
-	word1427: string "tipos"
-	word1428: string "tirar"
-	word1429: string "tiras"
-	word1430: string "tiros"
-	word1431: string "titio"
-	word1432: string "tocar"
-	word1433: string "tocos"
-	word1434: string "todos"
-	word1435: string "tolos"
-	word1436: string "tonal"
-	word1437: string "tonel"
-	word1438: string "tonus"
-	word1439: string "topar"
-	word1440: string "topos"
-	word1441: string "toque"
-	word1442: string "torce"
-	word1443: string "torno"
-	word1444: string "torpe"
-	word1445: string "torre"
-	word1446: string "torso"
-	word1447: string "torta"
-	word1448: string "torto"
-	word1449: string "tosar"
-	word1450: string "total"
-	word1451: string "touro"
-	word1452: string "traca"
-	word1453: string "traco"
-	word1454: string "traga"
-	word1455: string "trago"
-	word1456: string "trair"
-	word1457: string "trapo"
-	word1458: string "trava"
-	word1459: string "treco"
-	word1460: string "treze"
-	word1461: string "triar"
-	word1462: string "tribo"
-	word1463: string "trico"
-	word1464: string "trigo"
-	word1465: string "trios"
-	word1466: string "tripa"
-	word1467: string "tripe"
-	word1468: string "troca"
-	word1469: string "tropa"
-	word1470: string "truco"
-	word1471: string "truta"
-	word1472: string "tubos"
-	word1473: string "tufao"
-	word1474: string "tufos"
-	word1475: string "tulha"
-	word1476: string "tumor"
-	word1477: string "tunel"
-	word1478: string "turco"
-	word1479: string "turma"
-	word1480: string "turne"
-	word1481: string "turno"
-	word1482: string "tutor"
-	word1483: string "uivar"
-	word1484: string "uivos"
-	word1485: string "umido"
-	word1486: string "uncao"
-	word1487: string "ungir"
-	word1488: string "unhar"
-	word1489: string "unhas"
-	word1490: string "uniao"
-	word1491: string "unico"
-	word1492: string "unido"
-	word1493: string "untar"
-	word1494: string "urgir"
-	word1495: string "urina"
-	word1496: string "urnas"
-	word1497: string "urrar"
-	word1498: string "urros"
-	word1499: string "ursos"
-	word1500: string "urubu"
-	word1501: string "usina"
-	word1502: string "usual"
-	word1503: string "utero"
-	word1504: string "vacas"
-	word1505: string "vacuo"
-	word1506: string "vagao"
-	word1507: string "vagar"
-	word1508: string "vagem"
-	word1509: string "vagos"
-	word1510: string "vaiar"
-	word1511: string "valas"
-	word1512: string "vales"
-	word1513: string "valor"
-	word1514: string "vapor"
-	word1515: string "varao"
-	word1516: string "varas"
-	word1517: string "varoa"
-	word1518: string "vazao"
-	word1519: string "vazar"
-	word1520: string "vedar"
-	word1521: string "velas"
-	word1522: string "velho"
-	word1523: string "veloz"
-	word1524: string "venda"
-	word1525: string "vento"
-	word1526: string "venus"
-	word1527: string "verao"
-	word1528: string "verbo"
-	word1529: string "verde"
-	word1530: string "verme"
-	word1531: string "verso"
-	word1532: string "vesgo"
-	word1533: string "vespa"
-	word1534: string "veste"
-	word1535: string "vetar"
-	word1536: string "vetor"
-	word1537: string "vetos"
-	word1538: string "vicio"
-	word1539: string "vidas"
-	word1540: string "video"
-	word1541: string "vidro"
-	word1542: string "vigor"
-	word1543: string "vilao"
-	word1544: string "vilas"
-	word1545: string "vinda"
-	word1546: string "vinho"
-	word1547: string "vinil"
-	word1548: string "viola"
-	word1549: string "viral"
-	word1550: string "virar"
-	word1551: string "viril"
-	word1552: string "virus"
-	word1553: string "visao"
-	word1554: string "visar"
-	word1555: string "visor"
-	word1556: string "visos"
-	word1557: string "vista"
-	word1558: string "vital"
-	word1559: string "viuva"
-	word1560: string "vivaz"
-	word1561: string "viver"
-	word1562: string "vivos"
-	word1563: string "vocal"
-	word1564: string "vogal"
-	word1565: string "volei"
-	word1566: string "volta"
-	word1567: string "votar"
-	word1568: string "votos"
-	word1569: string "vozes"
-	word1570: string "vulgo"
-	word1571: string "xampu"
-	word1572: string "zebra"
-	word1573: string "zelar"
-	word1574: string "zerar"
-	word1575: string "zeros"
-	word1576: string "ziper"
-	word1577: string "zonas"
-	word1578: string "zorra"
-	static palavras + #0, #word0
-	static palavras + #1, #word1
-	static palavras + #2, #word2
-	static palavras + #3, #word3
-	static palavras + #4, #word4
-	static palavras + #5, #word5
-	static palavras + #6, #word6
-	static palavras + #7, #word7
-	static palavras + #8, #word8
-	static palavras + #9, #word9
-	static palavras + #10, #word10
-	static palavras + #11, #word11
-	static palavras + #12, #word12
-	static palavras + #13, #word13
-	static palavras + #14, #word14
-	static palavras + #15, #word15
-	static palavras + #16, #word16
-	static palavras + #17, #word17
-	static palavras + #18, #word18
-	static palavras + #19, #word19
-	static palavras + #20, #word20
-	static palavras + #21, #word21
-	static palavras + #22, #word22
-	static palavras + #23, #word23
-	static palavras + #24, #word24
-	static palavras + #25, #word25
-	static palavras + #26, #word26
-	static palavras + #27, #word27
-	static palavras + #28, #word28
-	static palavras + #29, #word29
-	static palavras + #30, #word30
-	static palavras + #31, #word31
-	static palavras + #32, #word32
-	static palavras + #33, #word33
-	static palavras + #34, #word34
-	static palavras + #35, #word35
-	static palavras + #36, #word36
-	static palavras + #37, #word37
-	static palavras + #38, #word38
-	static palavras + #39, #word39
-	static palavras + #40, #word40
-	static palavras + #41, #word41
-	static palavras + #42, #word42
-	static palavras + #43, #word43
-	static palavras + #44, #word44
-	static palavras + #45, #word45
-	static palavras + #46, #word46
-	static palavras + #47, #word47
-	static palavras + #48, #word48
-	static palavras + #49, #word49
-	static palavras + #50, #word50
-	static palavras + #51, #word51
-	static palavras + #52, #word52
-	static palavras + #53, #word53
-	static palavras + #54, #word54
-	static palavras + #55, #word55
-	static palavras + #56, #word56
-	static palavras + #57, #word57
-	static palavras + #58, #word58
-	static palavras + #59, #word59
-	static palavras + #60, #word60
-	static palavras + #61, #word61
-	static palavras + #62, #word62
-	static palavras + #63, #word63
-	static palavras + #64, #word64
-	static palavras + #65, #word65
-	static palavras + #66, #word66
-	static palavras + #67, #word67
-	static palavras + #68, #word68
-	static palavras + #69, #word69
-	static palavras + #70, #word70
-	static palavras + #71, #word71
-	static palavras + #72, #word72
-	static palavras + #73, #word73
-	static palavras + #74, #word74
-	static palavras + #75, #word75
-	static palavras + #76, #word76
-	static palavras + #77, #word77
-	static palavras + #78, #word78
-	static palavras + #79, #word79
-	static palavras + #80, #word80
-	static palavras + #81, #word81
-	static palavras + #82, #word82
-	static palavras + #83, #word83
-	static palavras + #84, #word84
-	static palavras + #85, #word85
-	static palavras + #86, #word86
-	static palavras + #87, #word87
-	static palavras + #88, #word88
-	static palavras + #89, #word89
-	static palavras + #90, #word90
-	static palavras + #91, #word91
-	static palavras + #92, #word92
-	static palavras + #93, #word93
-	static palavras + #94, #word94
-	static palavras + #95, #word95
-	static palavras + #96, #word96
-	static palavras + #97, #word97
-	static palavras + #98, #word98
-	static palavras + #99, #word99
-	static palavras + #100, #word100
-	static palavras + #101, #word101
-	static palavras + #102, #word102
-	static palavras + #103, #word103
-	static palavras + #104, #word104
-	static palavras + #105, #word105
-	static palavras + #106, #word106
-	static palavras + #107, #word107
-	static palavras + #108, #word108
-	static palavras + #109, #word109
-	static palavras + #110, #word110
-	static palavras + #111, #word111
-	static palavras + #112, #word112
-	static palavras + #113, #word113
-	static palavras + #114, #word114
-	static palavras + #115, #word115
-	static palavras + #116, #word116
-	static palavras + #117, #word117
-	static palavras + #118, #word118
-	static palavras + #119, #word119
-	static palavras + #120, #word120
-	static palavras + #121, #word121
-	static palavras + #122, #word122
-	static palavras + #123, #word123
-	static palavras + #124, #word124
-	static palavras + #125, #word125
-	static palavras + #126, #word126
-	static palavras + #127, #word127
-	static palavras + #128, #word128
-	static palavras + #129, #word129
-	static palavras + #130, #word130
-	static palavras + #131, #word131
-	static palavras + #132, #word132
-	static palavras + #133, #word133
-	static palavras + #134, #word134
-	static palavras + #135, #word135
-	static palavras + #136, #word136
-	static palavras + #137, #word137
-	static palavras + #138, #word138
-	static palavras + #139, #word139
-	static palavras + #140, #word140
-	static palavras + #141, #word141
-	static palavras + #142, #word142
-	static palavras + #143, #word143
-	static palavras + #144, #word144
-	static palavras + #145, #word145
-	static palavras + #146, #word146
-	static palavras + #147, #word147
-	static palavras + #148, #word148
-	static palavras + #149, #word149
-	static palavras + #150, #word150
-	static palavras + #151, #word151
-	static palavras + #152, #word152
-	static palavras + #153, #word153
-	static palavras + #154, #word154
-	static palavras + #155, #word155
-	static palavras + #156, #word156
-	static palavras + #157, #word157
-	static palavras + #158, #word158
-	static palavras + #159, #word159
-	static palavras + #160, #word160
-	static palavras + #161, #word161
-	static palavras + #162, #word162
-	static palavras + #163, #word163
-	static palavras + #164, #word164
-	static palavras + #165, #word165
-	static palavras + #166, #word166
-	static palavras + #167, #word167
-	static palavras + #168, #word168
-	static palavras + #169, #word169
-	static palavras + #170, #word170
-	static palavras + #171, #word171
-	static palavras + #172, #word172
-	static palavras + #173, #word173
-	static palavras + #174, #word174
-	static palavras + #175, #word175
-	static palavras + #176, #word176
-	static palavras + #177, #word177
-	static palavras + #178, #word178
-	static palavras + #179, #word179
-	static palavras + #180, #word180
-	static palavras + #181, #word181
-	static palavras + #182, #word182
-	static palavras + #183, #word183
-	static palavras + #184, #word184
-	static palavras + #185, #word185
-	static palavras + #186, #word186
-	static palavras + #187, #word187
-	static palavras + #188, #word188
-	static palavras + #189, #word189
-	static palavras + #190, #word190
-	static palavras + #191, #word191
-	static palavras + #192, #word192
-	static palavras + #193, #word193
-	static palavras + #194, #word194
-	static palavras + #195, #word195
-	static palavras + #196, #word196
-	static palavras + #197, #word197
-	static palavras + #198, #word198
-	static palavras + #199, #word199
-	static palavras + #200, #word200
-	static palavras + #201, #word201
-	static palavras + #202, #word202
-	static palavras + #203, #word203
-	static palavras + #204, #word204
-	static palavras + #205, #word205
-	static palavras + #206, #word206
-	static palavras + #207, #word207
-	static palavras + #208, #word208
-	static palavras + #209, #word209
-	static palavras + #210, #word210
-	static palavras + #211, #word211
-	static palavras + #212, #word212
-	static palavras + #213, #word213
-	static palavras + #214, #word214
-	static palavras + #215, #word215
-	static palavras + #216, #word216
-	static palavras + #217, #word217
-	static palavras + #218, #word218
-	static palavras + #219, #word219
-	static palavras + #220, #word220
-	static palavras + #221, #word221
-	static palavras + #222, #word222
-	static palavras + #223, #word223
-	static palavras + #224, #word224
-	static palavras + #225, #word225
-	static palavras + #226, #word226
-	static palavras + #227, #word227
-	static palavras + #228, #word228
-	static palavras + #229, #word229
-	static palavras + #230, #word230
-	static palavras + #231, #word231
-	static palavras + #232, #word232
-	static palavras + #233, #word233
-	static palavras + #234, #word234
-	static palavras + #235, #word235
-	static palavras + #236, #word236
-	static palavras + #237, #word237
-	static palavras + #238, #word238
-	static palavras + #239, #word239
-	static palavras + #240, #word240
-	static palavras + #241, #word241
-	static palavras + #242, #word242
-	static palavras + #243, #word243
-	static palavras + #244, #word244
-	static palavras + #245, #word245
-	static palavras + #246, #word246
-	static palavras + #247, #word247
-	static palavras + #248, #word248
-	static palavras + #249, #word249
-	static palavras + #250, #word250
-	static palavras + #251, #word251
-	static palavras + #252, #word252
-	static palavras + #253, #word253
-	static palavras + #254, #word254
-	static palavras + #255, #word255
-	static palavras + #256, #word256
-	static palavras + #257, #word257
-	static palavras + #258, #word258
-	static palavras + #259, #word259
-	static palavras + #260, #word260
-	static palavras + #261, #word261
-	static palavras + #262, #word262
-	static palavras + #263, #word263
-	static palavras + #264, #word264
-	static palavras + #265, #word265
-	static palavras + #266, #word266
-	static palavras + #267, #word267
-	static palavras + #268, #word268
-	static palavras + #269, #word269
-	static palavras + #270, #word270
-	static palavras + #271, #word271
-	static palavras + #272, #word272
-	static palavras + #273, #word273
-	static palavras + #274, #word274
-	static palavras + #275, #word275
-	static palavras + #276, #word276
-	static palavras + #277, #word277
-	static palavras + #278, #word278
-	static palavras + #279, #word279
-	static palavras + #280, #word280
-	static palavras + #281, #word281
-	static palavras + #282, #word282
-	static palavras + #283, #word283
-	static palavras + #284, #word284
-	static palavras + #285, #word285
-	static palavras + #286, #word286
-	static palavras + #287, #word287
-	static palavras + #288, #word288
-	static palavras + #289, #word289
-	static palavras + #290, #word290
-	static palavras + #291, #word291
-	static palavras + #292, #word292
-	static palavras + #293, #word293
-	static palavras + #294, #word294
-	static palavras + #295, #word295
-	static palavras + #296, #word296
-	static palavras + #297, #word297
-	static palavras + #298, #word298
-	static palavras + #299, #word299
-	static palavras + #300, #word300
-	static palavras + #301, #word301
-	static palavras + #302, #word302
-	static palavras + #303, #word303
-	static palavras + #304, #word304
-	static palavras + #305, #word305
-	static palavras + #306, #word306
-	static palavras + #307, #word307
-	static palavras + #308, #word308
-	static palavras + #309, #word309
-	static palavras + #310, #word310
-	static palavras + #311, #word311
-	static palavras + #312, #word312
-	static palavras + #313, #word313
-	static palavras + #314, #word314
-	static palavras + #315, #word315
-	static palavras + #316, #word316
-	static palavras + #317, #word317
-	static palavras + #318, #word318
-	static palavras + #319, #word319
-	static palavras + #320, #word320
-	static palavras + #321, #word321
-	static palavras + #322, #word322
-	static palavras + #323, #word323
-	static palavras + #324, #word324
-	static palavras + #325, #word325
-	static palavras + #326, #word326
-	static palavras + #327, #word327
-	static palavras + #328, #word328
-	static palavras + #329, #word329
-	static palavras + #330, #word330
-	static palavras + #331, #word331
-	static palavras + #332, #word332
-	static palavras + #333, #word333
-	static palavras + #334, #word334
-	static palavras + #335, #word335
-	static palavras + #336, #word336
-	static palavras + #337, #word337
-	static palavras + #338, #word338
-	static palavras + #339, #word339
-	static palavras + #340, #word340
-	static palavras + #341, #word341
-	static palavras + #342, #word342
-	static palavras + #343, #word343
-	static palavras + #344, #word344
-	static palavras + #345, #word345
-	static palavras + #346, #word346
-	static palavras + #347, #word347
-	static palavras + #348, #word348
-	static palavras + #349, #word349
-	static palavras + #350, #word350
-	static palavras + #351, #word351
-	static palavras + #352, #word352
-	static palavras + #353, #word353
-	static palavras + #354, #word354
-	static palavras + #355, #word355
-	static palavras + #356, #word356
-	static palavras + #357, #word357
-	static palavras + #358, #word358
-	static palavras + #359, #word359
-	static palavras + #360, #word360
-	static palavras + #361, #word361
-	static palavras + #362, #word362
-	static palavras + #363, #word363
-	static palavras + #364, #word364
-	static palavras + #365, #word365
-	static palavras + #366, #word366
-	static palavras + #367, #word367
-	static palavras + #368, #word368
-	static palavras + #369, #word369
-	static palavras + #370, #word370
-	static palavras + #371, #word371
-	static palavras + #372, #word372
-	static palavras + #373, #word373
-	static palavras + #374, #word374
-	static palavras + #375, #word375
-	static palavras + #376, #word376
-	static palavras + #377, #word377
-	static palavras + #378, #word378
-	static palavras + #379, #word379
-	static palavras + #380, #word380
-	static palavras + #381, #word381
-	static palavras + #382, #word382
-	static palavras + #383, #word383
-	static palavras + #384, #word384
-	static palavras + #385, #word385
-	static palavras + #386, #word386
-	static palavras + #387, #word387
-	static palavras + #388, #word388
-	static palavras + #389, #word389
-	static palavras + #390, #word390
-	static palavras + #391, #word391
-	static palavras + #392, #word392
-	static palavras + #393, #word393
-	static palavras + #394, #word394
-	static palavras + #395, #word395
-	static palavras + #396, #word396
-	static palavras + #397, #word397
-	static palavras + #398, #word398
-	static palavras + #399, #word399
-	static palavras + #400, #word400
-	static palavras + #401, #word401
-	static palavras + #402, #word402
-	static palavras + #403, #word403
-	static palavras + #404, #word404
-	static palavras + #405, #word405
-	static palavras + #406, #word406
-	static palavras + #407, #word407
-	static palavras + #408, #word408
-	static palavras + #409, #word409
-	static palavras + #410, #word410
-	static palavras + #411, #word411
-	static palavras + #412, #word412
-	static palavras + #413, #word413
-	static palavras + #414, #word414
-	static palavras + #415, #word415
-	static palavras + #416, #word416
-	static palavras + #417, #word417
-	static palavras + #418, #word418
-	static palavras + #419, #word419
-	static palavras + #420, #word420
-	static palavras + #421, #word421
-	static palavras + #422, #word422
-	static palavras + #423, #word423
-	static palavras + #424, #word424
-	static palavras + #425, #word425
-	static palavras + #426, #word426
-	static palavras + #427, #word427
-	static palavras + #428, #word428
-	static palavras + #429, #word429
-	static palavras + #430, #word430
-	static palavras + #431, #word431
-	static palavras + #432, #word432
-	static palavras + #433, #word433
-	static palavras + #434, #word434
-	static palavras + #435, #word435
-	static palavras + #436, #word436
-	static palavras + #437, #word437
-	static palavras + #438, #word438
-	static palavras + #439, #word439
-	static palavras + #440, #word440
-	static palavras + #441, #word441
-	static palavras + #442, #word442
-	static palavras + #443, #word443
-	static palavras + #444, #word444
-	static palavras + #445, #word445
-	static palavras + #446, #word446
-	static palavras + #447, #word447
-	static palavras + #448, #word448
-	static palavras + #449, #word449
-	static palavras + #450, #word450
-	static palavras + #451, #word451
-	static palavras + #452, #word452
-	static palavras + #453, #word453
-	static palavras + #454, #word454
-	static palavras + #455, #word455
-	static palavras + #456, #word456
-	static palavras + #457, #word457
-	static palavras + #458, #word458
-	static palavras + #459, #word459
-	static palavras + #460, #word460
-	static palavras + #461, #word461
-	static palavras + #462, #word462
-	static palavras + #463, #word463
-	static palavras + #464, #word464
-	static palavras + #465, #word465
-	static palavras + #466, #word466
-	static palavras + #467, #word467
-	static palavras + #468, #word468
-	static palavras + #469, #word469
-	static palavras + #470, #word470
-	static palavras + #471, #word471
-	static palavras + #472, #word472
-	static palavras + #473, #word473
-	static palavras + #474, #word474
-	static palavras + #475, #word475
-	static palavras + #476, #word476
-	static palavras + #477, #word477
-	static palavras + #478, #word478
-	static palavras + #479, #word479
-	static palavras + #480, #word480
-	static palavras + #481, #word481
-	static palavras + #482, #word482
-	static palavras + #483, #word483
-	static palavras + #484, #word484
-	static palavras + #485, #word485
-	static palavras + #486, #word486
-	static palavras + #487, #word487
-	static palavras + #488, #word488
-	static palavras + #489, #word489
-	static palavras + #490, #word490
-	static palavras + #491, #word491
-	static palavras + #492, #word492
-	static palavras + #493, #word493
-	static palavras + #494, #word494
-	static palavras + #495, #word495
-	static palavras + #496, #word496
-	static palavras + #497, #word497
-	static palavras + #498, #word498
-	static palavras + #499, #word499
-	static palavras + #500, #word500
-	static palavras + #501, #word501
-	static palavras + #502, #word502
-	static palavras + #503, #word503
-	static palavras + #504, #word504
-	static palavras + #505, #word505
-	static palavras + #506, #word506
-	static palavras + #507, #word507
-	static palavras + #508, #word508
-	static palavras + #509, #word509
-	static palavras + #510, #word510
-	static palavras + #511, #word511
-	static palavras + #512, #word512
-	static palavras + #513, #word513
-	static palavras + #514, #word514
-	static palavras + #515, #word515
-	static palavras + #516, #word516
-	static palavras + #517, #word517
-	static palavras + #518, #word518
-	static palavras + #519, #word519
-	static palavras + #520, #word520
-	static palavras + #521, #word521
-	static palavras + #522, #word522
-	static palavras + #523, #word523
-	static palavras + #524, #word524
-	static palavras + #525, #word525
-	static palavras + #526, #word526
-	static palavras + #527, #word527
-	static palavras + #528, #word528
-	static palavras + #529, #word529
-	static palavras + #530, #word530
-	static palavras + #531, #word531
-	static palavras + #532, #word532
-	static palavras + #533, #word533
-	static palavras + #534, #word534
-	static palavras + #535, #word535
-	static palavras + #536, #word536
-	static palavras + #537, #word537
-	static palavras + #538, #word538
-	static palavras + #539, #word539
-	static palavras + #540, #word540
-	static palavras + #541, #word541
-	static palavras + #542, #word542
-	static palavras + #543, #word543
-	static palavras + #544, #word544
-	static palavras + #545, #word545
-	static palavras + #546, #word546
-	static palavras + #547, #word547
-	static palavras + #548, #word548
-	static palavras + #549, #word549
-	static palavras + #550, #word550
-	static palavras + #551, #word551
-	static palavras + #552, #word552
-	static palavras + #553, #word553
-	static palavras + #554, #word554
-	static palavras + #555, #word555
-	static palavras + #556, #word556
-	static palavras + #557, #word557
-	static palavras + #558, #word558
-	static palavras + #559, #word559
-	static palavras + #560, #word560
-	static palavras + #561, #word561
-	static palavras + #562, #word562
-	static palavras + #563, #word563
-	static palavras + #564, #word564
-	static palavras + #565, #word565
-	static palavras + #566, #word566
-	static palavras + #567, #word567
-	static palavras + #568, #word568
-	static palavras + #569, #word569
-	static palavras + #570, #word570
-	static palavras + #571, #word571
-	static palavras + #572, #word572
-	static palavras + #573, #word573
-	static palavras + #574, #word574
-	static palavras + #575, #word575
-	static palavras + #576, #word576
-	static palavras + #577, #word577
-	static palavras + #578, #word578
-	static palavras + #579, #word579
-	static palavras + #580, #word580
-	static palavras + #581, #word581
-	static palavras + #582, #word582
-	static palavras + #583, #word583
-	static palavras + #584, #word584
-	static palavras + #585, #word585
-	static palavras + #586, #word586
-	static palavras + #587, #word587
-	static palavras + #588, #word588
-	static palavras + #589, #word589
-	static palavras + #590, #word590
-	static palavras + #591, #word591
-	static palavras + #592, #word592
-	static palavras + #593, #word593
-	static palavras + #594, #word594
-	static palavras + #595, #word595
-	static palavras + #596, #word596
-	static palavras + #597, #word597
-	static palavras + #598, #word598
-	static palavras + #599, #word599
-	static palavras + #600, #word600
-	static palavras + #601, #word601
-	static palavras + #602, #word602
-	static palavras + #603, #word603
-	static palavras + #604, #word604
-	static palavras + #605, #word605
-	static palavras + #606, #word606
-	static palavras + #607, #word607
-	static palavras + #608, #word608
-	static palavras + #609, #word609
-	static palavras + #610, #word610
-	static palavras + #611, #word611
-	static palavras + #612, #word612
-	static palavras + #613, #word613
-	static palavras + #614, #word614
-	static palavras + #615, #word615
-	static palavras + #616, #word616
-	static palavras + #617, #word617
-	static palavras + #618, #word618
-	static palavras + #619, #word619
-	static palavras + #620, #word620
-	static palavras + #621, #word621
-	static palavras + #622, #word622
-	static palavras + #623, #word623
-	static palavras + #624, #word624
-	static palavras + #625, #word625
-	static palavras + #626, #word626
-	static palavras + #627, #word627
-	static palavras + #628, #word628
-	static palavras + #629, #word629
-	static palavras + #630, #word630
-	static palavras + #631, #word631
-	static palavras + #632, #word632
-	static palavras + #633, #word633
-	static palavras + #634, #word634
-	static palavras + #635, #word635
-	static palavras + #636, #word636
-	static palavras + #637, #word637
-	static palavras + #638, #word638
-	static palavras + #639, #word639
-	static palavras + #640, #word640
-	static palavras + #641, #word641
-	static palavras + #642, #word642
-	static palavras + #643, #word643
-	static palavras + #644, #word644
-	static palavras + #645, #word645
-	static palavras + #646, #word646
-	static palavras + #647, #word647
-	static palavras + #648, #word648
-	static palavras + #649, #word649
-	static palavras + #650, #word650
-	static palavras + #651, #word651
-	static palavras + #652, #word652
-	static palavras + #653, #word653
-	static palavras + #654, #word654
-	static palavras + #655, #word655
-	static palavras + #656, #word656
-	static palavras + #657, #word657
-	static palavras + #658, #word658
-	static palavras + #659, #word659
-	static palavras + #660, #word660
-	static palavras + #661, #word661
-	static palavras + #662, #word662
-	static palavras + #663, #word663
-	static palavras + #664, #word664
-	static palavras + #665, #word665
-	static palavras + #666, #word666
-	static palavras + #667, #word667
-	static palavras + #668, #word668
-	static palavras + #669, #word669
-	static palavras + #670, #word670
-	static palavras + #671, #word671
-	static palavras + #672, #word672
-	static palavras + #673, #word673
-	static palavras + #674, #word674
-	static palavras + #675, #word675
-	static palavras + #676, #word676
-	static palavras + #677, #word677
-	static palavras + #678, #word678
-	static palavras + #679, #word679
-	static palavras + #680, #word680
-	static palavras + #681, #word681
-	static palavras + #682, #word682
-	static palavras + #683, #word683
-	static palavras + #684, #word684
-	static palavras + #685, #word685
-	static palavras + #686, #word686
-	static palavras + #687, #word687
-	static palavras + #688, #word688
-	static palavras + #689, #word689
-	static palavras + #690, #word690
-	static palavras + #691, #word691
-	static palavras + #692, #word692
-	static palavras + #693, #word693
-	static palavras + #694, #word694
-	static palavras + #695, #word695
-	static palavras + #696, #word696
-	static palavras + #697, #word697
-	static palavras + #698, #word698
-	static palavras + #699, #word699
-	static palavras + #700, #word700
-	static palavras + #701, #word701
-	static palavras + #702, #word702
-	static palavras + #703, #word703
-	static palavras + #704, #word704
-	static palavras + #705, #word705
-	static palavras + #706, #word706
-	static palavras + #707, #word707
-	static palavras + #708, #word708
-	static palavras + #709, #word709
-	static palavras + #710, #word710
-	static palavras + #711, #word711
-	static palavras + #712, #word712
-	static palavras + #713, #word713
-	static palavras + #714, #word714
-	static palavras + #715, #word715
-	static palavras + #716, #word716
-	static palavras + #717, #word717
-	static palavras + #718, #word718
-	static palavras + #719, #word719
-	static palavras + #720, #word720
-	static palavras + #721, #word721
-	static palavras + #722, #word722
-	static palavras + #723, #word723
-	static palavras + #724, #word724
-	static palavras + #725, #word725
-	static palavras + #726, #word726
-	static palavras + #727, #word727
-	static palavras + #728, #word728
-	static palavras + #729, #word729
-	static palavras + #730, #word730
-	static palavras + #731, #word731
-	static palavras + #732, #word732
-	static palavras + #733, #word733
-	static palavras + #734, #word734
-	static palavras + #735, #word735
-	static palavras + #736, #word736
-	static palavras + #737, #word737
-	static palavras + #738, #word738
-	static palavras + #739, #word739
-	static palavras + #740, #word740
-	static palavras + #741, #word741
-	static palavras + #742, #word742
-	static palavras + #743, #word743
-	static palavras + #744, #word744
-	static palavras + #745, #word745
-	static palavras + #746, #word746
-	static palavras + #747, #word747
-	static palavras + #748, #word748
-	static palavras + #749, #word749
-	static palavras + #750, #word750
-	static palavras + #751, #word751
-	static palavras + #752, #word752
-	static palavras + #753, #word753
-	static palavras + #754, #word754
-	static palavras + #755, #word755
-	static palavras + #756, #word756
-	static palavras + #757, #word757
-	static palavras + #758, #word758
-	static palavras + #759, #word759
-	static palavras + #760, #word760
-	static palavras + #761, #word761
-	static palavras + #762, #word762
-	static palavras + #763, #word763
-	static palavras + #764, #word764
-	static palavras + #765, #word765
-	static palavras + #766, #word766
-	static palavras + #767, #word767
-	static palavras + #768, #word768
-	static palavras + #769, #word769
-	static palavras + #770, #word770
-	static palavras + #771, #word771
-	static palavras + #772, #word772
-	static palavras + #773, #word773
-	static palavras + #774, #word774
-	static palavras + #775, #word775
-	static palavras + #776, #word776
-	static palavras + #777, #word777
-	static palavras + #778, #word778
-	static palavras + #779, #word779
-	static palavras + #780, #word780
-	static palavras + #781, #word781
-	static palavras + #782, #word782
-	static palavras + #783, #word783
-	static palavras + #784, #word784
-	static palavras + #785, #word785
-	static palavras + #786, #word786
-	static palavras + #787, #word787
-	static palavras + #788, #word788
-	static palavras + #789, #word789
-	static palavras + #790, #word790
-	static palavras + #791, #word791
-	static palavras + #792, #word792
-	static palavras + #793, #word793
-	static palavras + #794, #word794
-	static palavras + #795, #word795
-	static palavras + #796, #word796
-	static palavras + #797, #word797
-	static palavras + #798, #word798
-	static palavras + #799, #word799
-	static palavras + #800, #word800
-	static palavras + #801, #word801
-	static palavras + #802, #word802
-	static palavras + #803, #word803
-	static palavras + #804, #word804
-	static palavras + #805, #word805
-	static palavras + #806, #word806
-	static palavras + #807, #word807
-	static palavras + #808, #word808
-	static palavras + #809, #word809
-	static palavras + #810, #word810
-	static palavras + #811, #word811
-	static palavras + #812, #word812
-	static palavras + #813, #word813
-	static palavras + #814, #word814
-	static palavras + #815, #word815
-	static palavras + #816, #word816
-	static palavras + #817, #word817
-	static palavras + #818, #word818
-	static palavras + #819, #word819
-	static palavras + #820, #word820
-	static palavras + #821, #word821
-	static palavras + #822, #word822
-	static palavras + #823, #word823
-	static palavras + #824, #word824
-	static palavras + #825, #word825
-	static palavras + #826, #word826
-	static palavras + #827, #word827
-	static palavras + #828, #word828
-	static palavras + #829, #word829
-	static palavras + #830, #word830
-	static palavras + #831, #word831
-	static palavras + #832, #word832
-	static palavras + #833, #word833
-	static palavras + #834, #word834
-	static palavras + #835, #word835
-	static palavras + #836, #word836
-	static palavras + #837, #word837
-	static palavras + #838, #word838
-	static palavras + #839, #word839
-	static palavras + #840, #word840
-	static palavras + #841, #word841
-	static palavras + #842, #word842
-	static palavras + #843, #word843
-	static palavras + #844, #word844
-	static palavras + #845, #word845
-	static palavras + #846, #word846
-	static palavras + #847, #word847
-	static palavras + #848, #word848
-	static palavras + #849, #word849
-	static palavras + #850, #word850
-	static palavras + #851, #word851
-	static palavras + #852, #word852
-	static palavras + #853, #word853
-	static palavras + #854, #word854
-	static palavras + #855, #word855
-	static palavras + #856, #word856
-	static palavras + #857, #word857
-	static palavras + #858, #word858
-	static palavras + #859, #word859
-	static palavras + #860, #word860
-	static palavras + #861, #word861
-	static palavras + #862, #word862
-	static palavras + #863, #word863
-	static palavras + #864, #word864
-	static palavras + #865, #word865
-	static palavras + #866, #word866
-	static palavras + #867, #word867
-	static palavras + #868, #word868
-	static palavras + #869, #word869
-	static palavras + #870, #word870
-	static palavras + #871, #word871
-	static palavras + #872, #word872
-	static palavras + #873, #word873
-	static palavras + #874, #word874
-	static palavras + #875, #word875
-	static palavras + #876, #word876
-	static palavras + #877, #word877
-	static palavras + #878, #word878
-	static palavras + #879, #word879
-	static palavras + #880, #word880
-	static palavras + #881, #word881
-	static palavras + #882, #word882
-	static palavras + #883, #word883
-	static palavras + #884, #word884
-	static palavras + #885, #word885
-	static palavras + #886, #word886
-	static palavras + #887, #word887
-	static palavras + #888, #word888
-	static palavras + #889, #word889
-	static palavras + #890, #word890
-	static palavras + #891, #word891
-	static palavras + #892, #word892
-	static palavras + #893, #word893
-	static palavras + #894, #word894
-	static palavras + #895, #word895
-	static palavras + #896, #word896
-	static palavras + #897, #word897
-	static palavras + #898, #word898
-	static palavras + #899, #word899
-	static palavras + #900, #word900
-	static palavras + #901, #word901
-	static palavras + #902, #word902
-	static palavras + #903, #word903
-	static palavras + #904, #word904
-	static palavras + #905, #word905
-	static palavras + #906, #word906
-	static palavras + #907, #word907
-	static palavras + #908, #word908
-	static palavras + #909, #word909
-	static palavras + #910, #word910
-	static palavras + #911, #word911
-	static palavras + #912, #word912
-	static palavras + #913, #word913
-	static palavras + #914, #word914
-	static palavras + #915, #word915
-	static palavras + #916, #word916
-	static palavras + #917, #word917
-	static palavras + #918, #word918
-	static palavras + #919, #word919
-	static palavras + #920, #word920
-	static palavras + #921, #word921
-	static palavras + #922, #word922
-	static palavras + #923, #word923
-	static palavras + #924, #word924
-	static palavras + #925, #word925
-	static palavras + #926, #word926
-	static palavras + #927, #word927
-	static palavras + #928, #word928
-	static palavras + #929, #word929
-	static palavras + #930, #word930
-	static palavras + #931, #word931
-	static palavras + #932, #word932
-	static palavras + #933, #word933
-	static palavras + #934, #word934
-	static palavras + #935, #word935
-	static palavras + #936, #word936
-	static palavras + #937, #word937
-	static palavras + #938, #word938
-	static palavras + #939, #word939
-	static palavras + #940, #word940
-	static palavras + #941, #word941
-	static palavras + #942, #word942
-	static palavras + #943, #word943
-	static palavras + #944, #word944
-	static palavras + #945, #word945
-	static palavras + #946, #word946
-	static palavras + #947, #word947
-	static palavras + #948, #word948
-	static palavras + #949, #word949
-	static palavras + #950, #word950
-	static palavras + #951, #word951
-	static palavras + #952, #word952
-	static palavras + #953, #word953
-	static palavras + #954, #word954
-	static palavras + #955, #word955
-	static palavras + #956, #word956
-	static palavras + #957, #word957
-	static palavras + #958, #word958
-	static palavras + #959, #word959
-	static palavras + #960, #word960
-	static palavras + #961, #word961
-	static palavras + #962, #word962
-	static palavras + #963, #word963
-	static palavras + #964, #word964
-	static palavras + #965, #word965
-	static palavras + #966, #word966
-	static palavras + #967, #word967
-	static palavras + #968, #word968
-	static palavras + #969, #word969
-	static palavras + #970, #word970
-	static palavras + #971, #word971
-	static palavras + #972, #word972
-	static palavras + #973, #word973
-	static palavras + #974, #word974
-	static palavras + #975, #word975
-	static palavras + #976, #word976
-	static palavras + #977, #word977
-	static palavras + #978, #word978
-	static palavras + #979, #word979
-	static palavras + #980, #word980
-	static palavras + #981, #word981
-	static palavras + #982, #word982
-	static palavras + #983, #word983
-	static palavras + #984, #word984
-	static palavras + #985, #word985
-	static palavras + #986, #word986
-	static palavras + #987, #word987
-	static palavras + #988, #word988
-	static palavras + #989, #word989
-	static palavras + #990, #word990
-	static palavras + #991, #word991
-	static palavras + #992, #word992
-	static palavras + #993, #word993
-	static palavras + #994, #word994
-	static palavras + #995, #word995
-	static palavras + #996, #word996
-	static palavras + #997, #word997
-	static palavras + #998, #word998
-	static palavras + #999, #word999
-	static palavras + #1000, #word1000
-	static palavras + #1001, #word1001
-	static palavras + #1002, #word1002
-	static palavras + #1003, #word1003
-	static palavras + #1004, #word1004
-	static palavras + #1005, #word1005
-	static palavras + #1006, #word1006
-	static palavras + #1007, #word1007
-	static palavras + #1008, #word1008
-	static palavras + #1009, #word1009
-	static palavras + #1010, #word1010
-	static palavras + #1011, #word1011
-	static palavras + #1012, #word1012
-	static palavras + #1013, #word1013
-	static palavras + #1014, #word1014
-	static palavras + #1015, #word1015
-	static palavras + #1016, #word1016
-	static palavras + #1017, #word1017
-	static palavras + #1018, #word1018
-	static palavras + #1019, #word1019
-	static palavras + #1020, #word1020
-	static palavras + #1021, #word1021
-	static palavras + #1022, #word1022
-	static palavras + #1023, #word1023
-	static palavras + #1024, #word1024
-	static palavras + #1025, #word1025
-	static palavras + #1026, #word1026
-	static palavras + #1027, #word1027
-	static palavras + #1028, #word1028
-	static palavras + #1029, #word1029
-	static palavras + #1030, #word1030
-	static palavras + #1031, #word1031
-	static palavras + #1032, #word1032
-	static palavras + #1033, #word1033
-	static palavras + #1034, #word1034
-	static palavras + #1035, #word1035
-	static palavras + #1036, #word1036
-	static palavras + #1037, #word1037
-	static palavras + #1038, #word1038
-	static palavras + #1039, #word1039
-	static palavras + #1040, #word1040
-	static palavras + #1041, #word1041
-	static palavras + #1042, #word1042
-	static palavras + #1043, #word1043
-	static palavras + #1044, #word1044
-	static palavras + #1045, #word1045
-	static palavras + #1046, #word1046
-	static palavras + #1047, #word1047
-	static palavras + #1048, #word1048
-	static palavras + #1049, #word1049
-	static palavras + #1050, #word1050
-	static palavras + #1051, #word1051
-	static palavras + #1052, #word1052
-	static palavras + #1053, #word1053
-	static palavras + #1054, #word1054
-	static palavras + #1055, #word1055
-	static palavras + #1056, #word1056
-	static palavras + #1057, #word1057
-	static palavras + #1058, #word1058
-	static palavras + #1059, #word1059
-	static palavras + #1060, #word1060
-	static palavras + #1061, #word1061
-	static palavras + #1062, #word1062
-	static palavras + #1063, #word1063
-	static palavras + #1064, #word1064
-	static palavras + #1065, #word1065
-	static palavras + #1066, #word1066
-	static palavras + #1067, #word1067
-	static palavras + #1068, #word1068
-	static palavras + #1069, #word1069
-	static palavras + #1070, #word1070
-	static palavras + #1071, #word1071
-	static palavras + #1072, #word1072
-	static palavras + #1073, #word1073
-	static palavras + #1074, #word1074
-	static palavras + #1075, #word1075
-	static palavras + #1076, #word1076
-	static palavras + #1077, #word1077
-	static palavras + #1078, #word1078
-	static palavras + #1079, #word1079
-	static palavras + #1080, #word1080
-	static palavras + #1081, #word1081
-	static palavras + #1082, #word1082
-	static palavras + #1083, #word1083
-	static palavras + #1084, #word1084
-	static palavras + #1085, #word1085
-	static palavras + #1086, #word1086
-	static palavras + #1087, #word1087
-	static palavras + #1088, #word1088
-	static palavras + #1089, #word1089
-	static palavras + #1090, #word1090
-	static palavras + #1091, #word1091
-	static palavras + #1092, #word1092
-	static palavras + #1093, #word1093
-	static palavras + #1094, #word1094
-	static palavras + #1095, #word1095
-	static palavras + #1096, #word1096
-	static palavras + #1097, #word1097
-	static palavras + #1098, #word1098
-	static palavras + #1099, #word1099
-	static palavras + #1100, #word1100
-	static palavras + #1101, #word1101
-	static palavras + #1102, #word1102
-	static palavras + #1103, #word1103
-	static palavras + #1104, #word1104
-	static palavras + #1105, #word1105
-	static palavras + #1106, #word1106
-	static palavras + #1107, #word1107
-	static palavras + #1108, #word1108
-	static palavras + #1109, #word1109
-	static palavras + #1110, #word1110
-	static palavras + #1111, #word1111
-	static palavras + #1112, #word1112
-	static palavras + #1113, #word1113
-	static palavras + #1114, #word1114
-	static palavras + #1115, #word1115
-	static palavras + #1116, #word1116
-	static palavras + #1117, #word1117
-	static palavras + #1118, #word1118
-	static palavras + #1119, #word1119
-	static palavras + #1120, #word1120
-	static palavras + #1121, #word1121
-	static palavras + #1122, #word1122
-	static palavras + #1123, #word1123
-	static palavras + #1124, #word1124
-	static palavras + #1125, #word1125
-	static palavras + #1126, #word1126
-	static palavras + #1127, #word1127
-	static palavras + #1128, #word1128
-	static palavras + #1129, #word1129
-	static palavras + #1130, #word1130
-	static palavras + #1131, #word1131
-	static palavras + #1132, #word1132
-	static palavras + #1133, #word1133
-	static palavras + #1134, #word1134
-	static palavras + #1135, #word1135
-	static palavras + #1136, #word1136
-	static palavras + #1137, #word1137
-	static palavras + #1138, #word1138
-	static palavras + #1139, #word1139
-	static palavras + #1140, #word1140
-	static palavras + #1141, #word1141
-	static palavras + #1142, #word1142
-	static palavras + #1143, #word1143
-	static palavras + #1144, #word1144
-	static palavras + #1145, #word1145
-	static palavras + #1146, #word1146
-	static palavras + #1147, #word1147
-	static palavras + #1148, #word1148
-	static palavras + #1149, #word1149
-	static palavras + #1150, #word1150
-	static palavras + #1151, #word1151
-	static palavras + #1152, #word1152
-	static palavras + #1153, #word1153
-	static palavras + #1154, #word1154
-	static palavras + #1155, #word1155
-	static palavras + #1156, #word1156
-	static palavras + #1157, #word1157
-	static palavras + #1158, #word1158
-	static palavras + #1159, #word1159
-	static palavras + #1160, #word1160
-	static palavras + #1161, #word1161
-	static palavras + #1162, #word1162
-	static palavras + #1163, #word1163
-	static palavras + #1164, #word1164
-	static palavras + #1165, #word1165
-	static palavras + #1166, #word1166
-	static palavras + #1167, #word1167
-	static palavras + #1168, #word1168
-	static palavras + #1169, #word1169
-	static palavras + #1170, #word1170
-	static palavras + #1171, #word1171
-	static palavras + #1172, #word1172
-	static palavras + #1173, #word1173
-	static palavras + #1174, #word1174
-	static palavras + #1175, #word1175
-	static palavras + #1176, #word1176
-	static palavras + #1177, #word1177
-	static palavras + #1178, #word1178
-	static palavras + #1179, #word1179
-	static palavras + #1180, #word1180
-	static palavras + #1181, #word1181
-	static palavras + #1182, #word1182
-	static palavras + #1183, #word1183
-	static palavras + #1184, #word1184
-	static palavras + #1185, #word1185
-	static palavras + #1186, #word1186
-	static palavras + #1187, #word1187
-	static palavras + #1188, #word1188
-	static palavras + #1189, #word1189
-	static palavras + #1190, #word1190
-	static palavras + #1191, #word1191
-	static palavras + #1192, #word1192
-	static palavras + #1193, #word1193
-	static palavras + #1194, #word1194
-	static palavras + #1195, #word1195
-	static palavras + #1196, #word1196
-	static palavras + #1197, #word1197
-	static palavras + #1198, #word1198
-	static palavras + #1199, #word1199
-	static palavras + #1200, #word1200
-	static palavras + #1201, #word1201
-	static palavras + #1202, #word1202
-	static palavras + #1203, #word1203
-	static palavras + #1204, #word1204
-	static palavras + #1205, #word1205
-	static palavras + #1206, #word1206
-	static palavras + #1207, #word1207
-	static palavras + #1208, #word1208
-	static palavras + #1209, #word1209
-	static palavras + #1210, #word1210
-	static palavras + #1211, #word1211
-	static palavras + #1212, #word1212
-	static palavras + #1213, #word1213
-	static palavras + #1214, #word1214
-	static palavras + #1215, #word1215
-	static palavras + #1216, #word1216
-	static palavras + #1217, #word1217
-	static palavras + #1218, #word1218
-	static palavras + #1219, #word1219
-	static palavras + #1220, #word1220
-	static palavras + #1221, #word1221
-	static palavras + #1222, #word1222
-	static palavras + #1223, #word1223
-	static palavras + #1224, #word1224
-	static palavras + #1225, #word1225
-	static palavras + #1226, #word1226
-	static palavras + #1227, #word1227
-	static palavras + #1228, #word1228
-	static palavras + #1229, #word1229
-	static palavras + #1230, #word1230
-	static palavras + #1231, #word1231
-	static palavras + #1232, #word1232
-	static palavras + #1233, #word1233
-	static palavras + #1234, #word1234
-	static palavras + #1235, #word1235
-	static palavras + #1236, #word1236
-	static palavras + #1237, #word1237
-	static palavras + #1238, #word1238
-	static palavras + #1239, #word1239
-	static palavras + #1240, #word1240
-	static palavras + #1241, #word1241
-	static palavras + #1242, #word1242
-	static palavras + #1243, #word1243
-	static palavras + #1244, #word1244
-	static palavras + #1245, #word1245
-	static palavras + #1246, #word1246
-	static palavras + #1247, #word1247
-	static palavras + #1248, #word1248
-	static palavras + #1249, #word1249
-	static palavras + #1250, #word1250
-	static palavras + #1251, #word1251
-	static palavras + #1252, #word1252
-	static palavras + #1253, #word1253
-	static palavras + #1254, #word1254
-	static palavras + #1255, #word1255
-	static palavras + #1256, #word1256
-	static palavras + #1257, #word1257
-	static palavras + #1258, #word1258
-	static palavras + #1259, #word1259
-	static palavras + #1260, #word1260
-	static palavras + #1261, #word1261
-	static palavras + #1262, #word1262
-	static palavras + #1263, #word1263
-	static palavras + #1264, #word1264
-	static palavras + #1265, #word1265
-	static palavras + #1266, #word1266
-	static palavras + #1267, #word1267
-	static palavras + #1268, #word1268
-	static palavras + #1269, #word1269
-	static palavras + #1270, #word1270
-	static palavras + #1271, #word1271
-	static palavras + #1272, #word1272
-	static palavras + #1273, #word1273
-	static palavras + #1274, #word1274
-	static palavras + #1275, #word1275
-	static palavras + #1276, #word1276
-	static palavras + #1277, #word1277
-	static palavras + #1278, #word1278
-	static palavras + #1279, #word1279
-	static palavras + #1280, #word1280
-	static palavras + #1281, #word1281
-	static palavras + #1282, #word1282
-	static palavras + #1283, #word1283
-	static palavras + #1284, #word1284
-	static palavras + #1285, #word1285
-	static palavras + #1286, #word1286
-	static palavras + #1287, #word1287
-	static palavras + #1288, #word1288
-	static palavras + #1289, #word1289
-	static palavras + #1290, #word1290
-	static palavras + #1291, #word1291
-	static palavras + #1292, #word1292
-	static palavras + #1293, #word1293
-	static palavras + #1294, #word1294
-	static palavras + #1295, #word1295
-	static palavras + #1296, #word1296
-	static palavras + #1297, #word1297
-	static palavras + #1298, #word1298
-	static palavras + #1299, #word1299
-	static palavras + #1300, #word1300
-	static palavras + #1301, #word1301
-	static palavras + #1302, #word1302
-	static palavras + #1303, #word1303
-	static palavras + #1304, #word1304
-	static palavras + #1305, #word1305
-	static palavras + #1306, #word1306
-	static palavras + #1307, #word1307
-	static palavras + #1308, #word1308
-	static palavras + #1309, #word1309
-	static palavras + #1310, #word1310
-	static palavras + #1311, #word1311
-	static palavras + #1312, #word1312
-	static palavras + #1313, #word1313
-	static palavras + #1314, #word1314
-	static palavras + #1315, #word1315
-	static palavras + #1316, #word1316
-	static palavras + #1317, #word1317
-	static palavras + #1318, #word1318
-	static palavras + #1319, #word1319
-	static palavras + #1320, #word1320
-	static palavras + #1321, #word1321
-	static palavras + #1322, #word1322
-	static palavras + #1323, #word1323
-	static palavras + #1324, #word1324
-	static palavras + #1325, #word1325
-	static palavras + #1326, #word1326
-	static palavras + #1327, #word1327
-	static palavras + #1328, #word1328
-	static palavras + #1329, #word1329
-	static palavras + #1330, #word1330
-	static palavras + #1331, #word1331
-	static palavras + #1332, #word1332
-	static palavras + #1333, #word1333
-	static palavras + #1334, #word1334
-	static palavras + #1335, #word1335
-	static palavras + #1336, #word1336
-	static palavras + #1337, #word1337
-	static palavras + #1338, #word1338
-	static palavras + #1339, #word1339
-	static palavras + #1340, #word1340
-	static palavras + #1341, #word1341
-	static palavras + #1342, #word1342
-	static palavras + #1343, #word1343
-	static palavras + #1344, #word1344
-	static palavras + #1345, #word1345
-	static palavras + #1346, #word1346
-	static palavras + #1347, #word1347
-	static palavras + #1348, #word1348
-	static palavras + #1349, #word1349
-	static palavras + #1350, #word1350
-	static palavras + #1351, #word1351
-	static palavras + #1352, #word1352
-	static palavras + #1353, #word1353
-	static palavras + #1354, #word1354
-	static palavras + #1355, #word1355
-	static palavras + #1356, #word1356
-	static palavras + #1357, #word1357
-	static palavras + #1358, #word1358
-	static palavras + #1359, #word1359
-	static palavras + #1360, #word1360
-	static palavras + #1361, #word1361
-	static palavras + #1362, #word1362
-	static palavras + #1363, #word1363
-	static palavras + #1364, #word1364
-	static palavras + #1365, #word1365
-	static palavras + #1366, #word1366
-	static palavras + #1367, #word1367
-	static palavras + #1368, #word1368
-	static palavras + #1369, #word1369
-	static palavras + #1370, #word1370
-	static palavras + #1371, #word1371
-	static palavras + #1372, #word1372
-	static palavras + #1373, #word1373
-	static palavras + #1374, #word1374
-	static palavras + #1375, #word1375
-	static palavras + #1376, #word1376
-	static palavras + #1377, #word1377
-	static palavras + #1378, #word1378
-	static palavras + #1379, #word1379
-	static palavras + #1380, #word1380
-	static palavras + #1381, #word1381
-	static palavras + #1382, #word1382
-	static palavras + #1383, #word1383
-	static palavras + #1384, #word1384
-	static palavras + #1385, #word1385
-	static palavras + #1386, #word1386
-	static palavras + #1387, #word1387
-	static palavras + #1388, #word1388
-	static palavras + #1389, #word1389
-	static palavras + #1390, #word1390
-	static palavras + #1391, #word1391
-	static palavras + #1392, #word1392
-	static palavras + #1393, #word1393
-	static palavras + #1394, #word1394
-	static palavras + #1395, #word1395
-	static palavras + #1396, #word1396
-	static palavras + #1397, #word1397
-	static palavras + #1398, #word1398
-	static palavras + #1399, #word1399
-	static palavras + #1400, #word1400
-	static palavras + #1401, #word1401
-	static palavras + #1402, #word1402
-	static palavras + #1403, #word1403
-	static palavras + #1404, #word1404
-	static palavras + #1405, #word1405
-	static palavras + #1406, #word1406
-	static palavras + #1407, #word1407
-	static palavras + #1408, #word1408
-	static palavras + #1409, #word1409
-	static palavras + #1410, #word1410
-	static palavras + #1411, #word1411
-	static palavras + #1412, #word1412
-	static palavras + #1413, #word1413
-	static palavras + #1414, #word1414
-	static palavras + #1415, #word1415
-	static palavras + #1416, #word1416
-	static palavras + #1417, #word1417
-	static palavras + #1418, #word1418
-	static palavras + #1419, #word1419
-	static palavras + #1420, #word1420
-	static palavras + #1421, #word1421
-	static palavras + #1422, #word1422
-	static palavras + #1423, #word1423
-	static palavras + #1424, #word1424
-	static palavras + #1425, #word1425
-	static palavras + #1426, #word1426
-	static palavras + #1427, #word1427
-	static palavras + #1428, #word1428
-	static palavras + #1429, #word1429
-	static palavras + #1430, #word1430
-	static palavras + #1431, #word1431
-	static palavras + #1432, #word1432
-	static palavras + #1433, #word1433
-	static palavras + #1434, #word1434
-	static palavras + #1435, #word1435
-	static palavras + #1436, #word1436
-	static palavras + #1437, #word1437
-	static palavras + #1438, #word1438
-	static palavras + #1439, #word1439
-	static palavras + #1440, #word1440
-	static palavras + #1441, #word1441
-	static palavras + #1442, #word1442
-	static palavras + #1443, #word1443
-	static palavras + #1444, #word1444
-	static palavras + #1445, #word1445
-	static palavras + #1446, #word1446
-	static palavras + #1447, #word1447
-	static palavras + #1448, #word1448
-	static palavras + #1449, #word1449
-	static palavras + #1450, #word1450
-	static palavras + #1451, #word1451
-	static palavras + #1452, #word1452
-	static palavras + #1453, #word1453
-	static palavras + #1454, #word1454
-	static palavras + #1455, #word1455
-	static palavras + #1456, #word1456
-	static palavras + #1457, #word1457
-	static palavras + #1458, #word1458
-	static palavras + #1459, #word1459
-	static palavras + #1460, #word1460
-	static palavras + #1461, #word1461
-	static palavras + #1462, #word1462
-	static palavras + #1463, #word1463
-	static palavras + #1464, #word1464
-	static palavras + #1465, #word1465
-	static palavras + #1466, #word1466
-	static palavras + #1467, #word1467
-	static palavras + #1468, #word1468
-	static palavras + #1469, #word1469
-	static palavras + #1470, #word1470
-	static palavras + #1471, #word1471
-	static palavras + #1472, #word1472
-	static palavras + #1473, #word1473
-	static palavras + #1474, #word1474
-	static palavras + #1475, #word1475
-	static palavras + #1476, #word1476
-	static palavras + #1477, #word1477
-	static palavras + #1478, #word1478
-	static palavras + #1479, #word1479
-	static palavras + #1480, #word1480
-	static palavras + #1481, #word1481
-	static palavras + #1482, #word1482
-	static palavras + #1483, #word1483
-	static palavras + #1484, #word1484
-	static palavras + #1485, #word1485
-	static palavras + #1486, #word1486
-	static palavras + #1487, #word1487
-	static palavras + #1488, #word1488
-	static palavras + #1489, #word1489
-	static palavras + #1490, #word1490
-	static palavras + #1491, #word1491
-	static palavras + #1492, #word1492
-	static palavras + #1493, #word1493
-	static palavras + #1494, #word1494
-	static palavras + #1495, #word1495
-	static palavras + #1496, #word1496
-	static palavras + #1497, #word1497
-	static palavras + #1498, #word1498
-	static palavras + #1499, #word1499
-	static palavras + #1500, #word1500
-	static palavras + #1501, #word1501
-	static palavras + #1502, #word1502
-	static palavras + #1503, #word1503
-	static palavras + #1504, #word1504
-	static palavras + #1505, #word1505
-	static palavras + #1506, #word1506
-	static palavras + #1507, #word1507
-	static palavras + #1508, #word1508
-	static palavras + #1509, #word1509
-	static palavras + #1510, #word1510
-	static palavras + #1511, #word1511
-	static palavras + #1512, #word1512
-	static palavras + #1513, #word1513
-	static palavras + #1514, #word1514
-	static palavras + #1515, #word1515
-	static palavras + #1516, #word1516
-	static palavras + #1517, #word1517
-	static palavras + #1518, #word1518
-	static palavras + #1519, #word1519
-	static palavras + #1520, #word1520
-	static palavras + #1521, #word1521
-	static palavras + #1522, #word1522
-	static palavras + #1523, #word1523
-	static palavras + #1524, #word1524
-	static palavras + #1525, #word1525
-	static palavras + #1526, #word1526
-	static palavras + #1527, #word1527
-	static palavras + #1528, #word1528
-	static palavras + #1529, #word1529
-	static palavras + #1530, #word1530
-	static palavras + #1531, #word1531
-	static palavras + #1532, #word1532
-	static palavras + #1533, #word1533
-	static palavras + #1534, #word1534
-	static palavras + #1535, #word1535
-	static palavras + #1536, #word1536
-	static palavras + #1537, #word1537
-	static palavras + #1538, #word1538
-	static palavras + #1539, #word1539
-	static palavras + #1540, #word1540
-	static palavras + #1541, #word1541
-	static palavras + #1542, #word1542
-	static palavras + #1543, #word1543
-	static palavras + #1544, #word1544
-	static palavras + #1545, #word1545
-	static palavras + #1546, #word1546
-	static palavras + #1547, #word1547
-	static palavras + #1548, #word1548
-	static palavras + #1549, #word1549
-	static palavras + #1550, #word1550
-	static palavras + #1551, #word1551
-	static palavras + #1552, #word1552
-	static palavras + #1553, #word1553
-	static palavras + #1554, #word1554
-	static palavras + #1555, #word1555
-	static palavras + #1556, #word1556
-	static palavras + #1557, #word1557
-	static palavras + #1558, #word1558
-	static palavras + #1559, #word1559
-	static palavras + #1560, #word1560
-	static palavras + #1561, #word1561
-	static palavras + #1562, #word1562
-	static palavras + #1563, #word1563
-	static palavras + #1564, #word1564
-	static palavras + #1565, #word1565
-	static palavras + #1566, #word1566
-	static palavras + #1567, #word1567
-	static palavras + #1568, #word1568
-	static palavras + #1569, #word1569
-	static palavras + #1570, #word1570
-	static palavras + #1571, #word1571
-	static palavras + #1572, #word1572
-	static palavras + #1573, #word1573
-	static palavras + #1574, #word1574
-	static palavras + #1575, #word1575
-	static palavras + #1576, #word1576
-	static palavras + #1577, #word1577
-	static palavras + #1578, #word1578
+    loadn r0, #512
+    loadn r1, #2304
+    loadn r2, #2816
+    loadn r3, #0
+
+    store Verde, r0
+    store Vermelho, r1 
+    store Amarelo, r2
+    store Branco, r3 
+
+;; --- Guardando as palavras ---
+    ; Definindo numero de palavras e as alocando---
+
+    loadn r0, #1579
+    n_palavras: var #1
+    store n_palavras, r0
+
+    palavras: var #1579
+
+    word0: string "abaco"
+    word1: string "abada"
+    word2: string "abana"
+    word3: string "abril"
+    word4: string "abrir"
+    word5: string "acais"
+    word6: string "acaro"
+    word7: string "acaso"
+    word8: string "aceso"
+    word9: string "achar"
+    word10: string "acido"
+    word11: string "acima"
+    word12: string "acola"
+    word13: string "acres"
+    word14: string "acusa"
+    word15: string "adaga"
+    word16: string "adeus"
+    word17: string "adiar"
+    word18: string "advir"
+    word19: string "afeto"
+    word20: string "afiar"
+    word21: string "afora"
+    word22: string "agape"
+    word23: string "agora"
+    word24: string "aguar"
+    word25: string "aguas"
+    word26: string "aguda"
+    word27: string "agudo"
+    word28: string "ainda"
+    word29: string "aipim"
+    word30: string "aipos"
+    word31: string "alcar"
+    word32: string "alema"
+    word33: string "algas"
+    word34: string "algum"
+    word35: string "alhos"
+    word36: string "aliar"
+    word37: string "alias"
+    word38: string "alibi"
+    word39: string "almas"
+    word40: string "altar"
+    word41: string "altas"
+    word42: string "altos"
+    word43: string "aluno"
+    word44: string "alvor"
+    word45: string "amada"
+    word46: string "amado"
+    word47: string "amago"
+    word48: string "ambar"
+    word49: string "amido"
+    word50: string "amigo"
+    word51: string "amora"
+    word52: string "amplo"
+    word53: string "andar"
+    word54: string "animo"
+    word55: string "anjos"
+    word56: string "anodo"
+    word57: string "anoes"
+    word58: string "ansia"
+    word59: string "antas"
+    word60: string "antro"
+    word61: string "anuir"
+    word62: string "anzol"
+    word63: string "aonde"
+    word64: string "apaga"
+    word65: string "apelo"
+    word66: string "apice"
+    word67: string "apito"
+    word68: string "apoia"
+    word69: string "aqueo"
+    word70: string "arabe"
+    word71: string "arcar"
+    word72: string "arcas"
+    word73: string "arcos"
+    word74: string "arder"
+    word75: string "ardor"
+    word76: string "arear"
+    word77: string "areia"
+    word78: string "arena"
+    word79: string "arfar"
+    word80: string "aries"
+    word81: string "armar"
+    word82: string "arpao"
+    word83: string "arroz"
+    word84: string "artes"
+    word85: string "aspas"
+    word86: string "assar"
+    word87: string "assaz"
+    word88: string "assim"
+    word89: string "atico"
+    word90: string "atomo"
+    word91: string "atono"
+    word92: string "atras"
+    word93: string "atriz"
+    word94: string "atroz"
+    word95: string "atual"
+    word96: string "atuar"
+    word97: string "audio"
+    word98: string "aurea"
+    word99: string "aveia"
+    word100: string "avela"
+    word101: string "aviao"
+    word102: string "avido"
+    word103: string "aviso"
+    word104: string "azedo"
+    word105: string "azuis"
+    word106: string "babar"
+    word107: string "babas"
+    word108: string "bacia"
+    word109: string "bagas"
+    word110: string "bagre"
+    word111: string "bahia"
+    word112: string "baiao"
+    word113: string "baile"
+    word114: string "baixo"
+    word115: string "balao"
+    word116: string "balas"
+    word117: string "balde"
+    word118: string "balir"
+    word119: string "balsa"
+    word120: string "bamba"
+    word121: string "bambi"
+    word122: string "bambo"
+    word123: string "bambu"
+    word124: string "banal"
+    word125: string "banco"
+    word126: string "banda"
+    word127: string "bando"
+    word128: string "banho"
+    word129: string "banir"
+    word130: string "banjo"
+    word131: string "baoba"
+    word132: string "baque"
+    word133: string "barao"
+    word134: string "barba"
+    word135: string "barca"
+    word136: string "barco"
+    word137: string "bario"
+    word138: string "baroa"
+    word139: string "barra"
+    word140: string "barro"
+    word141: string "basal"
+    word142: string "basar"
+    word143: string "basco"
+    word144: string "bater"
+    word145: string "bauru"
+    word146: string "bazar"
+    word147: string "beber"
+    word148: string "bebes"
+    word149: string "bebum"
+    word150: string "beico"
+    word151: string "beijo"
+    word152: string "beira"
+    word153: string "belas"
+    word154: string "belem"
+    word155: string "belga"
+    word156: string "belos"
+    word157: string "bemol"
+    word158: string "bento"
+    word159: string "berbe"
+    word160: string "berco"
+    word161: string "berro"
+    word162: string "besta"
+    word163: string "betim"
+    word164: string "bicar"
+    word165: string "bicha"
+    word166: string "bicho"
+    word167: string "biela"
+    word168: string "bimba"
+    word169: string "bioma"
+    word170: string "biose"
+    word171: string "biota"
+    word172: string "bispo"
+    word173: string "bloco"
+    word174: string "blusa"
+    word175: string "bobao"
+    word176: string "bobos"
+    word177: string "bocal"
+    word178: string "bocas"
+    word179: string "bocel"
+    word180: string "bodar"
+    word181: string "bodes"
+    word182: string "boiar"
+    word183: string "boias"
+    word184: string "boina"
+    word185: string "bolao"
+    word186: string "bolar"
+    word187: string "bolas"
+    word188: string "boldo"
+    word189: string "bolha"
+    word190: string "bolor"
+    word191: string "bolos"
+    word192: string "bolsa"
+    word193: string "bolsa"
+    word194: string "bomba"
+    word195: string "bonar"
+    word196: string "bonde"
+    word197: string "bones"
+    word198: string "bonus"
+    word199: string "borda"
+    word200: string "bordo"
+    word201: string "borel"
+    word202: string "borra"
+    word203: string "bosco"
+    word204: string "boson"
+    word205: string "bossa"
+    word206: string "bosta"
+    word207: string "botar"
+    word208: string "botas"
+    word209: string "botim"
+    word210: string "botos"
+    word211: string "botox"
+    word212: string "bouba"
+    word213: string "bouda"
+    word214: string "braco"
+    word215: string "brasa"
+    word216: string "bravo"
+    word217: string "brear"
+    word218: string "breca"
+    word219: string "brega"
+    word220: string "brejo"
+    word221: string "breus"
+    word222: string "breve"
+    word223: string "briga"
+    word224: string "brisa"
+    word225: string "brita"
+    word226: string "broca"
+    word227: string "bromo"
+    word228: string "brumo"
+    word229: string "bruto"
+    word230: string "bruxa"
+    word231: string "bucal"
+    word232: string "bucha"
+    word233: string "bucho"
+    word234: string "bufar"
+    word235: string "bugio"
+    word236: string "bugre"
+    word237: string "bujao"
+    word238: string "bulbo"
+    word239: string "bules"
+    word240: string "bulir"
+    word241: string "bunda"
+    word242: string "burro"
+    word243: string "busca"
+    word244: string "busso"
+    word245: string "busto"
+    word246: string "buzio"
+    word247: string "cabal"
+    word248: string "caber"
+    word249: string "cabos"
+    word250: string "cabra"
+    word251: string "cacao"
+    word252: string "cacar"
+    word253: string "cacas"
+    word254: string "cacau"
+    word255: string "cache"
+    word256: string "cacho"
+    word257: string "caciz"
+    word258: string "cacos"
+    word259: string "cacto"
+    word260: string "cafes"
+    word261: string "cafta"
+    word262: string "cagar"
+    word263: string "cairo"
+    word264: string "cairu"
+    word265: string "caixa"
+    word266: string "cajas"
+    word267: string "cajus"
+    word268: string "calao"
+    word269: string "calar"
+    word270: string "calca"
+    word271: string "calco"
+    word272: string "caldo"
+    word273: string "calos"
+    word274: string "calvo"
+    word275: string "camas"
+    word276: string "campo"
+    word277: string "canal"
+    word278: string "canas"
+    word279: string "canil"
+    word280: string "canoa"
+    word281: string "canto"
+    word282: string "capas"
+    word283: string "capaz"
+    word284: string "capim"
+    word285: string "capuz"
+    word286: string "caqui"
+    word287: string "caras"
+    word288: string "carga"
+    word289: string "carie"
+    word290: string "carmo"
+    word291: string "carne"
+    word292: string "carne"
+    word293: string "caros"
+    word294: string "carro"
+    word295: string "carta"
+    word296: string "casal"
+    word297: string "casao"
+    word298: string "casar"
+    word299: string "casas"
+    word300: string "casca"
+    word301: string "casco"
+    word302: string "casos"
+    word303: string "caspa"
+    word304: string "casta"
+    word305: string "casto"
+    word306: string "catar"
+    word307: string "cauda"
+    word308: string "caule"
+    word309: string "causa"
+    word310: string "cavar"
+    word311: string "ceara"
+    word312: string "ceder"
+    word313: string "cedro"
+    word314: string "cegar"
+    word315: string "cegos"
+    word316: string "ceita"
+    word317: string "censo"
+    word318: string "cento"
+    word319: string "cerar"
+    word320: string "ceras"
+    word321: string "cerca"
+    word322: string "cerdo"
+    word323: string "cerne"
+    word324: string "cerol"
+    word325: string "cervo"
+    word326: string "cesta"
+    word327: string "cesto"
+    word328: string "cetim"
+    word329: string "cetro"
+    word330: string "chaga"
+    word331: string "chale"
+    word332: string "chama"
+    word333: string "chaos"
+    word334: string "chapa"
+    word335: string "chato"
+    word336: string "chave"
+    word337: string "chefe"
+    word338: string "cheio"
+    word339: string "chile"
+    word340: string "china"
+    word341: string "choco"
+    word342: string "chule"
+    word343: string "chuva"
+    word344: string "ciano"
+    word345: string "ciclo"
+    word346: string "cidra"
+    word347: string "cilio"
+    word348: string "cinza"
+    word349: string "cipos"
+    word350: string "circo"
+    word351: string "cisao"
+    word352: string "cisco"
+    word353: string "cisma"
+    word354: string "cisne"
+    word355: string "citar"
+    word356: string "ciume"
+    word357: string "civis"
+    word358: string "clara"
+    word359: string "claro"
+    word360: string "clava"
+    word361: string "clero"
+    word362: string "clima"
+    word363: string "clipe"
+    word364: string "clone"
+    word365: string "cloro"
+    word366: string "clube"
+    word367: string "cobre"
+    word368: string "cocar"
+    word369: string "cocos"
+    word370: string "codon"
+    word371: string "coeso"
+    word372: string "cofre"
+    word373: string "cohab"
+    word374: string "coice"
+    word375: string "coifa"
+    word376: string "coisa"
+    word377: string "coito"
+    word378: string "colar"
+    word379: string "colas"
+    word380: string "colon"
+    word381: string "colos"
+    word382: string "combe"
+    word383: string "combo"
+    word384: string "comer"
+    word385: string "comum"
+    word386: string "conde"
+    word387: string "congo"
+    word388: string "conta"
+    word389: string "conto"
+    word390: string "copas"
+    word391: string "copos"
+    word392: string "coral"
+    word393: string "corar"
+    word394: string "corda"
+    word395: string "cores"
+    word396: string "corgo"
+    word397: string "corno"
+    word398: string "coroa"
+    word399: string "coroa"
+    word400: string "corpo"
+    word401: string "corte"
+    word402: string "corvo"
+    word403: string "coser"
+    word404: string "cosmo"
+    word405: string "cospe"
+    word406: string "costa"
+    word407: string "cotas"
+    word408: string "couve"
+    word409: string "covas"
+    word410: string "covil"
+    word411: string "coxas"
+    word412: string "coxos"
+    word413: string "cravo"
+    word414: string "credo"
+    word415: string "creme"
+    word416: string "crepe"
+    word417: string "creta"
+    word418: string "criar"
+    word419: string "crime"
+    word420: string "crina"
+    word421: string "crise"
+    word422: string "crivo"
+    word423: string "cruel"
+    word424: string "cubos"
+    word425: string "cucas"
+    word426: string "cueca"
+    word427: string "culpa"
+    word428: string "culto"
+    word429: string "cunha"
+    word430: string "cunho"
+    word431: string "cupim"
+    word432: string "cupio"
+    word433: string "cupom"
+    word434: string "curar"
+    word435: string "curas"
+    word436: string "curau"
+    word437: string "curso"
+    word438: string "curto"
+    word439: string "curva"
+    word440: string "curvo"
+    word441: string "cuspe"
+    word442: string "custo"
+    word443: string "cutia"
+    word444: string "dados"
+    word445: string "damas"
+    word446: string "danar"
+    word447: string "danca"
+    word448: string "daqui"
+    word449: string "datar"
+    word450: string "datas"
+    word451: string "debil"
+    word452: string "dedos"
+    word453: string "delta"
+    word454: string "dengo"
+    word455: string "denso"
+    word456: string "dente"
+    word457: string "depor"
+    word458: string "derme"
+    word459: string "desce"
+    word460: string "deter"
+    word461: string "deusa"
+    word462: string "dever"
+    word463: string "devir"
+    word464: string "diabo"
+    word465: string "dicas"
+    word466: string "digno"
+    word467: string "disco"
+    word468: string "ditos"
+    word469: string "dizer"
+    word470: string "dobro"
+    word471: string "doces"
+    word472: string "docil"
+    word473: string "dogma"
+    word474: string "doido"
+    word475: string "dolar"
+    word476: string "domar"
+    word477: string "donas"
+    word478: string "donos"
+    word479: string "dopar"
+    word480: string "dores"
+    word481: string "dorso"
+    word482: string "dosar"
+    word483: string "doses"
+    word484: string "dotar"
+    word485: string "draga"
+    word486: string "drama"
+    word487: string "duble"
+    word488: string "ducto"
+    word489: string "duelo"
+    word490: string "dueto"
+    word491: string "dunas"
+    word492: string "duplo"
+    word493: string "duque"
+    word494: string "durar"
+    word495: string "duras"
+    word496: string "duzia"
+    word497: string "ebrio"
+    word498: string "ecoar"
+    word499: string "edema"
+    word500: string "egito"
+    word501: string "eixos"
+    word502: string "enfim"
+    word503: string "entao"
+    word504: string "entre"
+    word505: string "epico"
+    word506: string "epoca"
+    word507: string "errar"
+    word508: string "erros"
+    word509: string "ervas"
+    word510: string "estar"
+    word511: string "etapa"
+    word512: string "etico"
+    word513: string "etnia"
+    word514: string "exame"
+    word515: string "exato"
+    word516: string "exito"
+    word517: string "expor"
+    word518: string "extra"
+    word519: string "facao"
+    word520: string "facas"
+    word521: string "faces"
+    word522: string "facil"
+    word523: string "fadar"
+    word524: string "fadas"
+    word525: string "faixa"
+    word526: string "falar"
+    word527: string "falha"
+    word528: string "falir"
+    word529: string "falso"
+    word530: string "fanho"
+    word531: string "farao"
+    word532: string "farda"
+    word533: string "farol"
+    word534: string "farsa"
+    word535: string "farta"
+    word536: string "fasor"
+    word537: string "fatal"
+    word538: string "fatia"
+    word539: string "fator"
+    word540: string "fatos"
+    word541: string "faula"
+    word542: string "fauno"
+    word543: string "favas"
+    word544: string "favor"
+    word545: string "fazer"
+    word546: string "febre"
+    word547: string "fecal"
+    word548: string "fecho"
+    word549: string "feder"
+    word550: string "fedor"
+    word551: string "feias"
+    word552: string "feios"
+    word553: string "feira"
+    word554: string "feito"
+    word555: string "feixe"
+    word556: string "femea"
+    word557: string "femur"
+    word558: string "feras"
+    word559: string "ferir"
+    word560: string "feroz"
+    word561: string "ferpa"
+    word562: string "ferro"
+    word563: string "festa"
+    word564: string "fetal"
+    word565: string "fetos"
+    word566: string "feudo"
+    word567: string "fibra"
+    word568: string "ficar"
+    word569: string "filho"
+    word570: string "final"
+    word571: string "finar"
+    word572: string "finas"
+    word573: string "finca"
+    word574: string "finda"
+    word575: string "findo"
+    word576: string "firma"
+    word577: string "fitar"
+    word578: string "fitas"
+    word579: string "fixar"
+    word580: string "fixos"
+    word581: string "flama"
+    word582: string "flavo"
+    word583: string "floco"
+    word584: string "flora"
+    word585: string "fluir"
+    word586: string "fluor"
+    word587: string "fluxo"
+    word588: string "fobia"
+    word589: string "focal"
+    word590: string "focar"
+    word591: string "focas"
+    word592: string "focos"
+    word593: string "fofos"
+    word594: string "fogao"
+    word595: string "fogos"
+    word596: string "foice"
+    word597: string "folha"
+    word598: string "folia"
+    word599: string "fomes"
+    word600: string "fonte"
+    word601: string "forca"
+    word602: string "forca"
+    word603: string "forma"
+    word604: string "forno"
+    word605: string "forra"
+    word606: string "forro"
+    word607: string "forte"
+    word608: string "forum"
+    word609: string "fosco"
+    word610: string "fossa"
+    word611: string "fosso"
+    word612: string "fotos"
+    word613: string "fraco"
+    word614: string "frase"
+    word615: string "frear"
+    word616: string "freio"
+    word617: string "fresa"
+    word618: string "frete"
+    word619: string "frevo"
+    word620: string "frias"
+    word621: string "friez"
+    word622: string "frios"
+    word623: string "frita"
+    word624: string "frito"
+    word625: string "frota"
+    word626: string "fruta"
+    word627: string "fruto"
+    word628: string "fugaz"
+    word629: string "fugir"
+    word630: string "fumar"
+    word631: string "fumos"
+    word632: string "fundo"
+    word633: string "fungo"
+    word634: string "funil"
+    word635: string "furar"
+    word636: string "furia"
+    word637: string "furor"
+    word638: string "furos"
+    word639: string "fusao"
+    word640: string "fusil"
+    word641: string "fusos"
+    word642: string "futil"
+    word643: string "fuzil"
+    word644: string "fuzis"
+    word645: string "gabar"
+    word646: string "galho"
+    word647: string "galos"
+    word648: string "gamao"
+    word649: string "gamar"
+    word650: string "gamba"
+    word651: string "ganho"
+    word652: string "ganir"
+    word653: string "ganso"
+    word654: string "garbo"
+    word655: string "garca"
+    word656: string "garra"
+    word657: string "gases"
+    word658: string "gasto"
+    word659: string "gatos"
+    word660: string "geada"
+    word661: string "gelos"
+    word662: string "gemas"
+    word663: string "gemeo"
+    word664: string "gemer"
+    word665: string "genio"
+    word666: string "genro"
+    word667: string "gente"
+    word668: string "geral"
+    word669: string "gerar"
+    word670: string "germe"
+    word671: string "gesso"
+    word672: string "gesto"
+    word673: string "girar"
+    word674: string "giros"
+    word675: string "glace"
+    word676: string "globo"
+    word677: string "glote"
+    word678: string "gnomo"
+    word679: string "goela"
+    word680: string "goias"
+    word681: string "golas"
+    word682: string "golfo"
+    word683: string "golpe"
+    word684: string "gomas"
+    word685: string "gordo"
+    word686: string "gosma"
+    word687: string "gosto"
+    word688: string "graal"
+    word689: string "graca"
+    word690: string "grade"
+    word691: string "grafo"
+    word692: string "grama"
+    word693: string "graos"
+    word694: string "grato"
+    word695: string "grave"
+    word696: string "graxa"
+    word697: string "grego"
+    word698: string "greve"
+    word699: string "grilo"
+    word700: string "grude"
+    word701: string "grupo"
+    word702: string "gruta"
+    word703: string "guiar"
+    word704: string "guias"
+    word705: string "habil"
+    word706: string "hagar"
+    word707: string "harem"
+    word708: string "haste"
+    word709: string "helio"
+    word710: string "heras"
+    word711: string "heroi"
+    word712: string "hiato"
+    word713: string "hidra"
+    word714: string "hiena"
+    word715: string "hifen"
+    word716: string "himen"
+    word717: string "homem"
+    word718: string "honra"
+    word719: string "horas"
+    word720: string "horda"
+    word721: string "horta"
+    word722: string "hotel"
+    word723: string "hulha"
+    word724: string "humor"
+    word725: string "humus"
+    word726: string "icone"
+    word727: string "idear"
+    word728: string "ideia"
+    word729: string "idolo"
+    word730: string "igneo"
+    word731: string "igual"
+    word732: string "ileso"
+    word733: string "ilhas"
+    word734: string "impar"
+    word735: string "impio"
+    word736: string "impor"
+    word737: string "imune"
+    word738: string "index"
+    word739: string "india"
+    word740: string "indio"
+    word741: string "inves"
+    word742: string "irmao"
+    word743: string "irmas"
+    word744: string "iscas"
+    word745: string "jacas"
+    word746: string "jambo"
+    word747: string "jambu"
+    word748: string "janio"
+    word749: string "japao"
+    word750: string "jarro"
+    word751: string "jatos"
+    word752: string "jaula"
+    word753: string "jazer"
+    word754: string "jeito"
+    word755: string "jejum"
+    word756: string "jesus"
+    word757: string "jogar"
+    word758: string "jogos"
+    word759: string "joias"
+    word760: string "jotas"
+    word761: string "jovem"
+    word762: string "judeu"
+    word763: string "judia"
+    word764: string "juiza"
+    word765: string "juizo"
+    word766: string "julho"
+    word767: string "jumbo"
+    word768: string "junho"
+    word769: string "junia"
+    word770: string "jurar"
+    word771: string "justa"
+    word772: string "labio"
+    word773: string "labor"
+    word774: string "lacar"
+    word775: string "lacre"
+    word776: string "lagoa"
+    word777: string "lagos"
+    word778: string "laico"
+    word779: string "lamas"
+    word780: string "lambe"
+    word781: string "lanca"
+    word782: string "lapas"
+    word783: string "lapis"
+    word784: string "lapso"
+    word785: string "laque"
+    word786: string "largo"
+    word787: string "larva"
+    word788: string "lasca"
+    word789: string "latao"
+    word790: string "latas"
+    word791: string "latex"
+    word792: string "latim"
+    word793: string "latir"
+    word794: string "lauda"
+    word795: string "laudo"
+    word796: string "lavar"
+    word797: string "lavra"
+    word798: string "lazer"
+    word799: string "leais"
+    word800: string "lebre"
+    word801: string "legal"
+    word802: string "legua"
+    word803: string "leite"
+    word804: string "leito"
+    word805: string "lenco"
+    word806: string "lenha"
+    word807: string "lento"
+    word808: string "leoas"
+    word809: string "leoes"
+    word810: string "lepra"
+    word811: string "leque"
+    word812: string "lerdo"
+    word813: string "lesao"
+    word814: string "lesar"
+    word815: string "lesma"
+    word816: string "leste"
+    word817: string "letal"
+    word818: string "letra"
+    word819: string "levar"
+    word820: string "leves"
+    word821: string "lhama"
+    word822: string "liame"
+    word823: string "libra"
+    word824: string "licao"
+    word825: string "licor"
+    word826: string "lidar"
+    word827: string "lider"
+    word828: string "ligar"
+    word829: string "ligas"
+    word830: string "lilas"
+    word831: string "limao"
+    word832: string "limar"
+    word833: string "limas"
+    word834: string "limbo"
+    word835: string "limpo"
+    word836: string "lince"
+    word837: string "lindo"
+    word838: string "linha"
+    word839: string "linho"
+    word840: string "lirio"
+    word841: string "lisos"
+    word842: string "lista"
+    word843: string "litio"
+    word844: string "litro"
+    word845: string "livre"
+    word846: string "livro"
+    word847: string "lixao"
+    word848: string "lixar"
+    word849: string "lixas"
+    word850: string "lixos"
+    word851: string "lobos"
+    word852: string "local"
+    word853: string "locao"
+    word854: string "locar"
+    word855: string "lombo"
+    word856: string "lonas"
+    word857: string "longe"
+    word858: string "longo"
+    word859: string "lotar"
+    word860: string "lotus"
+    word861: string "louca"
+    word862: string "louco"
+    word863: string "louro"
+    word864: string "lousa"
+    word865: string "lucro"
+    word866: string "lugar"
+    word867: string "lulas"
+    word868: string "lunar"
+    word869: string "lutar"
+    word870: string "luvas"
+    word871: string "luxar"
+    word872: string "luxos"
+    word873: string "macas"
+    word874: string "macho"
+    word875: string "macio"
+    word876: string "macom"
+    word877: string "macos"
+    word878: string "madre"
+    word879: string "magma"
+    word880: string "magna"
+    word881: string "magoa"
+    word882: string "magro"
+    word883: string "maior"
+    word884: string "major"
+    word885: string "malas"
+    word886: string "malha"
+    word887: string "malta"
+    word888: string "mamae"
+    word889: string "mamao"
+    word890: string "mamar"
+    word891: string "mamas"
+    word892: string "manca"
+    word893: string "manga"
+    word894: string "manha"
+    word895: string "mania"
+    word896: string "manso"
+    word897: string "manta"
+    word898: string "manto"
+    word899: string "mapas"
+    word900: string "marca"
+    word901: string "marco"
+    word902: string "marco"
+    word903: string "mares"
+    word904: string "marte"
+    word905: string "massa"
+    word906: string "matar"
+    word907: string "matiz"
+    word908: string "matos"
+    word909: string "mecha"
+    word910: string "media"
+    word911: string "medio"
+    word912: string "medir"
+    word913: string "meias"
+    word914: string "meigo"
+    word915: string "meios"
+    word916: string "melao"
+    word917: string "melar"
+    word918: string "menor"
+    word919: string "menos"
+    word920: string "menta"
+    word921: string "merce"
+    word922: string "merda"
+    word923: string "meros"
+    word924: string "mesas"
+    word925: string "meses"
+    word926: string "mesmo"
+    word927: string "meter"
+    word928: string "metro"
+    word929: string "metro"
+    word930: string "mexer"
+    word931: string "midia"
+    word932: string "mijar"
+    word933: string "mijos"
+    word934: string "milho"
+    word935: string "mimar"
+    word936: string "minar"
+    word937: string "minas"
+    word938: string "minha"
+    word939: string "miolo"
+    word940: string "miope"
+    word941: string "mirar"
+    word942: string "miras"
+    word943: string "mirim"
+    word944: string "misto"
+    word945: string "miudo"
+    word946: string "mocas"
+    word947: string "modas"
+    word948: string "modos"
+    word949: string "moeda"
+    word950: string "moela"
+    word951: string "mofar"
+    word952: string "mofos"
+    word953: string "mogno"
+    word954: string "moita"
+    word955: string "molar"
+    word956: string "molas"
+    word957: string "molde"
+    word958: string "moles"
+    word959: string "molho"
+    word960: string "monja"
+    word961: string "morar"
+    word962: string "morro"
+    word963: string "morta"
+    word964: string "morte"
+    word965: string "morto"
+    word966: string "mosca"
+    word967: string "motel"
+    word968: string "motim"
+    word969: string "motor"
+    word970: string "motos"
+    word971: string "movel"
+    word972: string "mover"
+    word973: string "mudar"
+    word974: string "mudas"
+    word975: string "mudez"
+    word976: string "mudos"
+    word977: string "multa"
+    word978: string "mumia"
+    word979: string "mundo"
+    word980: string "munir"
+    word981: string "mural"
+    word982: string "muros"
+    word983: string "murro"
+    word984: string "musas"
+    word985: string "museu"
+    word986: string "nabos"
+    word987: string "nacao"
+    word988: string "nadar"
+    word989: string "nariz"
+    word990: string "nasal"
+    word991: string "natal"
+    word992: string "natas"
+    word993: string "naval"
+    word994: string "negar"
+    word995: string "negro"
+    word996: string "nepal"
+    word997: string "nervo"
+    word998: string "nevar"
+    word999: string "neves"
+    word1000: string "ninfa"
+    word1001: string "ninho"
+    word1002: string "ninja"
+    word1003: string "nobre"
+    word1004: string "nocao"
+    word1005: string "nodal"
+    word1006: string "nodos"
+    word1007: string "noivo"
+    word1008: string "nonos"
+    word1009: string "norte"
+    word1010: string "nosso"
+    word1011: string "notar"
+    word1012: string "notas"
+    word1013: string "novos"
+    word1014: string "nozes"
+    word1015: string "nudez"
+    word1016: string "nunca"
+    word1017: string "nuvem"
+    word1018: string "oasis"
+    word1019: string "obito"
+    word1020: string "obras"
+    word1021: string "obter"
+    word1022: string "obvio"
+    word1023: string "octal"
+    word1024: string "oculo"
+    word1025: string "odiar"
+    word1026: string "ofuro"
+    word1027: string "olhar"
+    word1028: string "olhos"
+    word1029: string "oliva"
+    word1030: string "ombro"
+    word1031: string "omega"
+    word1032: string "oncas"
+    word1033: string "ondas"
+    word1034: string "opaco"
+    word1035: string "opcao"
+    word1036: string "opera"
+    word1037: string "optar"
+    word1038: string "orfao"
+    word1039: string "ornar"
+    word1040: string "osseo"
+    word1041: string "ossos"
+    word1042: string "ostra"
+    word1043: string "otimo"
+    word1044: string "ouros"
+    word1045: string "ousar"
+    word1046: string "outro"
+    word1047: string "ouvir"
+    word1048: string "ovino"
+    word1049: string "ovulo"
+    word1050: string "oxido"
+    word1051: string "padre"
+    word1052: string "pagao"
+    word1053: string "pagar"
+    word1054: string "pagos"
+    word1055: string "paiol"
+    word1056: string "pajem"
+    word1057: string "pajes"
+    word1058: string "palco"
+    word1059: string "palha"
+    word1060: string "palma"
+    word1061: string "panda"
+    word1062: string "papar"
+    word1063: string "papel"
+    word1064: string "papos"
+    word1065: string "parar"
+    word1066: string "pardo"
+    word1067: string "pareo"
+    word1068: string "pares"
+    word1069: string "parir"
+    word1070: string "parte"
+    word1071: string "parto"
+    word1072: string "parvo"
+    word1073: string "passo"
+    word1074: string "pasto"
+    word1075: string "patas"
+    word1076: string "patio"
+    word1077: string "patos"
+    word1078: string "pavao"
+    word1079: string "pavio"
+    word1080: string "pavoa"
+    word1081: string "pavor"
+    word1082: string "pecar"
+    word1083: string "pecas"
+    word1084: string "pedal"
+    word1085: string "pedir"
+    word1086: string "pedra"
+    word1087: string "pegar"
+    word1088: string "peido"
+    word1089: string "peito"
+    word1090: string "peixe"
+    word1091: string "peles"
+    word1092: string "pelos"
+    word1093: string "pelve"
+    word1094: string "penal"
+    word1095: string "penar"
+    word1096: string "penas"
+    word1097: string "penca"
+    word1098: string "pente"
+    word1099: string "peoes"
+    word1100: string "pepel"
+    word1101: string "pequi"
+    word1102: string "peras"
+    word1103: string "perca"
+    word1104: string "perna"
+    word1105: string "persa"
+    word1106: string "perto"
+    word1107: string "perua"
+    word1108: string "pesar"
+    word1109: string "pesca"
+    word1110: string "pesos"
+    word1111: string "peste"
+    word1112: string "pifar"
+    word1113: string "pifio"
+    word1114: string "pilha"
+    word1115: string "pinar"
+    word1116: string "pingo"
+    word1117: string "pinha"
+    word1118: string "pinho"
+    word1119: string "pinos"
+    word1120: string "pinta"
+    word1121: string "pinto"
+    word1122: string "pioes"
+    word1123: string "pipas"
+    word1124: string "pirar"
+    word1125: string "piris"
+    word1126: string "pisar"
+    word1127: string "pisca"
+    word1128: string "pisos"
+    word1129: string "placa"
+    word1130: string "plano"
+    word1131: string "plato"
+    word1132: string "plebe"
+    word1133: string "pleno"
+    word1134: string "pluma"
+    word1135: string "pneus"
+    word1136: string "pobre"
+    word1137: string "pocos"
+    word1138: string "podar"
+    word1139: string "poder"
+    word1140: string "podio"
+    word1141: string "podre"
+    word1142: string "poema"
+    word1143: string "poeta"
+    word1144: string "polen"
+    word1145: string "polir"
+    word1146: string "polos"
+    word1147: string "polvo"
+    word1148: string "pomar"
+    word1149: string "pomba"
+    word1150: string "pombo"
+    word1151: string "ponei"
+    word1152: string "ponta"
+    word1153: string "ponte"
+    word1154: string "ponto"
+    word1155: string "porco"
+    word1156: string "porta"
+    word1157: string "porto"
+    word1158: string "posar"
+    word1159: string "posto"
+    word1160: string "potro"
+    word1161: string "pouco"
+    word1162: string "poupa"
+    word1163: string "povos"
+    word1164: string "praca"
+    word1165: string "praga"
+    word1166: string "praia"
+    word1167: string "prata"
+    word1168: string "prato"
+    word1169: string "prazo"
+    word1170: string "prece"
+    word1171: string "preco"
+    word1172: string "prego"
+    word1173: string "preso"
+    word1174: string "preto"
+    word1175: string "primo"
+    word1176: string "prior"
+    word1177: string "prole"
+    word1178: string "prosa"
+    word1179: string "pudim"
+    word1180: string "pudor"
+    word1181: string "pular"
+    word1182: string "pulga"
+    word1183: string "pulos"
+    word1184: string "punho"
+    word1185: string "punir"
+    word1186: string "puros"
+    word1187: string "puxar"
+    word1188: string "quase"
+    word1189: string "queda"
+    word1190: string "quibe"
+    word1191: string "quimo"
+    word1192: string "quina"
+    word1193: string "rabos"
+    word1194: string "racao"
+    word1195: string "radar"
+    word1196: string "radio"
+    word1197: string "raias"
+    word1198: string "raios"
+    word1199: string "raiva"
+    word1200: string "rajar"
+    word1201: string "ralar"
+    word1202: string "ralos"
+    word1203: string "ramal"
+    word1204: string "ramas"
+    word1205: string "ramos"
+    word1206: string "rampa"
+    word1207: string "ranho"
+    word1208: string "rapaz"
+    word1209: string "rapel"
+    word1210: string "raque"
+    word1211: string "raros"
+    word1212: string "rasos"
+    word1213: string "raspa"
+    word1214: string "ratos"
+    word1215: string "razao"
+    word1216: string "reais"
+    word1217: string "recem"
+    word1218: string "redes"
+    word1219: string "refem"
+    word1220: string "regar"
+    word1221: string "regio"
+    word1222: string "regra"
+    word1223: string "regua"
+    word1224: string "relar"
+    word1225: string "relva"
+    word1226: string "remar"
+    word1227: string "renal"
+    word1228: string "renda"
+    word1229: string "resto"
+    word1230: string "retos"
+    word1231: string "retro"
+    word1232: string "reuma"
+    word1233: string "reves"
+    word1234: string "revoa"
+    word1235: string "rezar"
+    word1236: string "ricos"
+    word1237: string "rifar"
+    word1238: string "rijos"
+    word1239: string "rimar"
+    word1240: string "rimas"
+    word1241: string "rixas"
+    word1242: string "robos"
+    word1243: string "rocar"
+    word1244: string "rocas"
+    word1245: string "rocha"
+    word1246: string "rodar"
+    word1247: string "rodas"
+    word1248: string "rodos"
+    word1249: string "rogar"
+    word1250: string "rojao"
+    word1251: string "rolar"
+    word1252: string "rolha"
+    word1253: string "romas"
+    word1254: string "rombo"
+    word1255: string "romeu"
+    word1256: string "ronda"
+    word1257: string "rosal"
+    word1258: string "rosas"
+    word1259: string "rosca"
+    word1260: string "rosto"
+    word1261: string "rotas"
+    word1262: string "rotor"
+    word1263: string "rouco"
+    word1264: string "roupa"
+    word1265: string "roxos"
+    word1266: string "rubor"
+    word1267: string "rubro"
+    word1268: string "rubro"
+    word1269: string "rudez"
+    word1270: string "ruela"
+    word1271: string "rufar"
+    word1272: string "rufos"
+    word1273: string "rugir"
+    word1274: string "ruina"
+    word1275: string "ruins"
+    word1276: string "ruivo"
+    word1277: string "rumar"
+    word1278: string "rumor"
+    word1279: string "rural"
+    word1280: string "russo"
+    word1281: string "saara"
+    word1282: string "sabao"
+    word1283: string "saber"
+    word1284: string "sabio"
+    word1285: string "sabor"
+    word1286: string "sabre"
+    word1287: string "sacar"
+    word1288: string "sacas"
+    word1289: string "sache"
+    word1290: string "sacos"
+    word1291: string "sacro"
+    word1292: string "sadio"
+    word1293: string "safar"
+    word1294: string "sagaz"
+    word1295: string "sagui"
+    word1296: string "saias"
+    word1297: string "saida"
+    word1298: string "salao"
+    word1299: string "salas"
+    word1300: string "salmo"
+    word1301: string "salsa"
+    word1302: string "salto"
+    word1303: string "salvo"
+    word1304: string "samba"
+    word1305: string "santo"
+    word1306: string "sapos"
+    word1307: string "sarar"
+    word1308: string "sarau"
+    word1309: string "sarda"
+    word1310: string "sarna"
+    word1311: string "saude"
+    word1312: string "sauna"
+    word1313: string "sebos"
+    word1314: string "secar"
+    word1315: string "secos"
+    word1316: string "secto"
+    word1317: string "sedar"
+    word1318: string "sedas"
+    word1319: string "seios"
+    word1320: string "seita"
+    word1321: string "seiva"
+    word1322: string "seixo"
+    word1323: string "selar"
+    word1324: string "selim"
+    word1325: string "selos"
+    word1326: string "selva"
+    word1327: string "semen"
+    word1328: string "senda"
+    word1329: string "senil"
+    word1330: string "senso"
+    word1331: string "serio"
+    word1332: string "serra"
+    word1333: string "setor"
+    word1334: string "sexos"
+    word1335: string "sexta"
+    word1336: string "sidra"
+    word1337: string "sifao"
+    word1338: string "sigma"
+    word1339: string "signo"
+    word1340: string "silvo"
+    word1341: string "sinal"
+    word1342: string "sinos"
+    word1343: string "siria"
+    word1344: string "sirio"
+    word1345: string "siris"
+    word1346: string "sisos"
+    word1347: string "sisto"
+    word1348: string "sitio"
+    word1349: string "sobre"
+    word1350: string "socar"
+    word1351: string "socio"
+    word1352: string "socos"
+    word1353: string "sodio"
+    word1354: string "sofas"
+    word1355: string "sogro"
+    word1356: string "sojas"
+    word1357: string "solas"
+    word1358: string "solda"
+    word1359: string "solos"
+    word1360: string "solta"
+    word1361: string "somar"
+    word1362: string "sonar"
+    word1363: string "sonda"
+    word1364: string "sonos"
+    word1365: string "sonso"
+    word1366: string "sopra"
+    word1367: string "soros"
+    word1368: string "sorte"
+    word1369: string "sosia"
+    word1370: string "sosso"
+    word1371: string "sotao"
+    word1372: string "sovar"
+    word1373: string "suave"
+    word1374: string "subir"
+    word1375: string "sucos"
+    word1376: string "sueco"
+    word1377: string "suica"
+    word1378: string "suico"
+    word1379: string "suino"
+    word1380: string "suite"
+    word1381: string "sujar"
+    word1382: string "sujos"
+    word1383: string "sulao"
+    word1384: string "sumos"
+    word1385: string "super"
+    word1386: string "surdo"
+    word1387: string "sutia"
+    word1388: string "sutil"
+    word1389: string "tabua"
+    word1390: string "tacar"
+    word1391: string "tacas"
+    word1392: string "tacos"
+    word1393: string "taiga"
+    word1394: string "talco"
+    word1395: string "tanto"
+    word1396: string "tapar"
+    word1397: string "tarar"
+    word1398: string "tarde"
+    word1399: string "tatus"
+    word1400: string "taxar"
+    word1401: string "tecer"
+    word1402: string "tedio"
+    word1403: string "telha"
+    word1404: string "telas"
+    word1405: string "temas"
+    word1406: string "temor"
+    word1407: string "tempo"
+    word1408: string "tenaz"
+    word1409: string "tenda"
+    word1410: string "tenor"
+    word1411: string "tenro"
+    word1412: string "tenso"
+    word1413: string "tenue"
+    word1414: string "terca"
+    word1415: string "terco"
+    word1416: string "terra"
+    word1417: string "testa"
+    word1418: string "tetas"
+    word1419: string "tetos"
+    word1420: string "texto"
+    word1421: string "tigre"
+    word1422: string "timao"
+    word1423: string "times"
+    word1424: string "tinir"
+    word1425: string "tinta"
+    word1426: string "tinto"
+    word1427: string "tipos"
+    word1428: string "tirar"
+    word1429: string "tiras"
+    word1430: string "tiros"
+    word1431: string "titio"
+    word1432: string "tocar"
+    word1433: string "tocos"
+    word1434: string "todos"
+    word1435: string "tolos"
+    word1436: string "tonal"
+    word1437: string "tonel"
+    word1438: string "tonus"
+    word1439: string "topar"
+    word1440: string "topos"
+    word1441: string "toque"
+    word1442: string "torce"
+    word1443: string "torno"
+    word1444: string "torpe"
+    word1445: string "torre"
+    word1446: string "torso"
+    word1447: string "torta"
+    word1448: string "torto"
+    word1449: string "tosar"
+    word1450: string "total"
+    word1451: string "touro"
+    word1452: string "traca"
+    word1453: string "traco"
+    word1454: string "traga"
+    word1455: string "trago"
+    word1456: string "trair"
+    word1457: string "trapo"
+    word1458: string "trava"
+    word1459: string "treco"
+    word1460: string "treze"
+    word1461: string "triar"
+    word1462: string "tribo"
+    word1463: string "trico"
+    word1464: string "trigo"
+    word1465: string "trios"
+    word1466: string "tripa"
+    word1467: string "tripe"
+    word1468: string "troca"
+    word1469: string "tropa"
+    word1470: string "truco"
+    word1471: string "truta"
+    word1472: string "tubos"
+    word1473: string "tufao"
+    word1474: string "tufos"
+    word1475: string "tulha"
+    word1476: string "tumor"
+    word1477: string "tunel"
+    word1478: string "turco"
+    word1479: string "turma"
+    word1480: string "turne"
+    word1481: string "turno"
+    word1482: string "tutor"
+    word1483: string "uivar"
+    word1484: string "uivos"
+    word1485: string "umido"
+    word1486: string "uncao"
+    word1487: string "ungir"
+    word1488: string "unhar"
+    word1489: string "unhas"
+    word1490: string "uniao"
+    word1491: string "unico"
+    word1492: string "unido"
+    word1493: string "untar"
+    word1494: string "urgir"
+    word1495: string "urina"
+    word1496: string "urnas"
+    word1497: string "urrar"
+    word1498: string "urros"
+    word1499: string "ursos"
+    word1500: string "urubu"
+    word1501: string "usina"
+    word1502: string "usual"
+    word1503: string "utero"
+    word1504: string "vacas"
+    word1505: string "vacuo"
+    word1506: string "vagao"
+    word1507: string "vagar"
+    word1508: string "vagem"
+    word1509: string "vagos"
+    word1510: string "vaiar"
+    word1511: string "valas"
+    word1512: string "vales"
+    word1513: string "valor"
+    word1514: string "vapor"
+    word1515: string "varao"
+    word1516: string "varas"
+    word1517: string "varoa"
+    word1518: string "vazao"
+    word1519: string "vazar"
+    word1520: string "vedar"
+    word1521: string "velas"
+    word1522: string "velho"
+    word1523: string "veloz"
+    word1524: string "venda"
+    word1525: string "vento"
+    word1526: string "venus"
+    word1527: string "verao"
+    word1528: string "verbo"
+    word1529: string "verde"
+    word1530: string "verme"
+    word1531: string "verso"
+    word1532: string "vesgo"
+    word1533: string "vespa"
+    word1534: string "veste"
+    word1535: string "vetar"
+    word1536: string "vetor"
+    word1537: string "vetos"
+    word1538: string "vicio"
+    word1539: string "vidas"
+    word1540: string "video"
+    word1541: string "vidro"
+    word1542: string "vigor"
+    word1543: string "vilao"
+    word1544: string "vilas"
+    word1545: string "vinda"
+    word1546: string "vinho"
+    word1547: string "vinil"
+    word1548: string "viola"
+    word1549: string "viral"
+    word1550: string "virar"
+    word1551: string "viril"
+    word1552: string "virus"
+    word1553: string "visao"
+    word1554: string "visar"
+    word1555: string "visor"
+    word1556: string "visos"
+    word1557: string "vista"
+    word1558: string "vital"
+    word1559: string "viuva"
+    word1560: string "vivaz"
+    word1561: string "viver"
+    word1562: string "vivos"
+    word1563: string "vocal"
+    word1564: string "vogal"
+    word1565: string "volei"
+    word1566: string "volta"
+    word1567: string "votar"
+    word1568: string "votos"
+    word1569: string "vozes"
+    word1570: string "vulgo"
+    word1571: string "xampu"
+    word1572: string "zebra"
+    word1573: string "zelar"
+    word1574: string "zerar"
+    word1575: string "zeros"
+    word1576: string "ziper"
+    word1577: string "zonas"
+    word1578: string "zorra"
+    static palavras + #0, #word0
+    static palavras + #1, #word1
+    static palavras + #2, #word2
+    static palavras + #3, #word3
+    static palavras + #4, #word4
+    static palavras + #5, #word5
+    static palavras + #6, #word6
+    static palavras + #7, #word7
+    static palavras + #8, #word8
+    static palavras + #9, #word9
+    static palavras + #10, #word10
+    static palavras + #11, #word11
+    static palavras + #12, #word12
+    static palavras + #13, #word13
+    static palavras + #14, #word14
+    static palavras + #15, #word15
+    static palavras + #16, #word16
+    static palavras + #17, #word17
+    static palavras + #18, #word18
+    static palavras + #19, #word19
+    static palavras + #20, #word20
+    static palavras + #21, #word21
+    static palavras + #22, #word22
+    static palavras + #23, #word23
+    static palavras + #24, #word24
+    static palavras + #25, #word25
+    static palavras + #26, #word26
+    static palavras + #27, #word27
+    static palavras + #28, #word28
+    static palavras + #29, #word29
+    static palavras + #30, #word30
+    static palavras + #31, #word31
+    static palavras + #32, #word32
+    static palavras + #33, #word33
+    static palavras + #34, #word34
+    static palavras + #35, #word35
+    static palavras + #36, #word36
+    static palavras + #37, #word37
+    static palavras + #38, #word38
+    static palavras + #39, #word39
+    static palavras + #40, #word40
+    static palavras + #41, #word41
+    static palavras + #42, #word42
+    static palavras + #43, #word43
+    static palavras + #44, #word44
+    static palavras + #45, #word45
+    static palavras + #46, #word46
+    static palavras + #47, #word47
+    static palavras + #48, #word48
+    static palavras + #49, #word49
+    static palavras + #50, #word50
+    static palavras + #51, #word51
+    static palavras + #52, #word52
+    static palavras + #53, #word53
+    static palavras + #54, #word54
+    static palavras + #55, #word55
+    static palavras + #56, #word56
+    static palavras + #57, #word57
+    static palavras + #58, #word58
+    static palavras + #59, #word59
+    static palavras + #60, #word60
+    static palavras + #61, #word61
+    static palavras + #62, #word62
+    static palavras + #63, #word63
+    static palavras + #64, #word64
+    static palavras + #65, #word65
+    static palavras + #66, #word66
+    static palavras + #67, #word67
+    static palavras + #68, #word68
+    static palavras + #69, #word69
+    static palavras + #70, #word70
+    static palavras + #71, #word71
+    static palavras + #72, #word72
+    static palavras + #73, #word73
+    static palavras + #74, #word74
+    static palavras + #75, #word75
+    static palavras + #76, #word76
+    static palavras + #77, #word77
+    static palavras + #78, #word78
+    static palavras + #79, #word79
+    static palavras + #80, #word80
+    static palavras + #81, #word81
+    static palavras + #82, #word82
+    static palavras + #83, #word83
+    static palavras + #84, #word84
+    static palavras + #85, #word85
+    static palavras + #86, #word86
+    static palavras + #87, #word87
+    static palavras + #88, #word88
+    static palavras + #89, #word89
+    static palavras + #90, #word90
+    static palavras + #91, #word91
+    static palavras + #92, #word92
+    static palavras + #93, #word93
+    static palavras + #94, #word94
+    static palavras + #95, #word95
+    static palavras + #96, #word96
+    static palavras + #97, #word97
+    static palavras + #98, #word98
+    static palavras + #99, #word99
+    static palavras + #100, #word100
+    static palavras + #101, #word101
+    static palavras + #102, #word102
+    static palavras + #103, #word103
+    static palavras + #104, #word104
+    static palavras + #105, #word105
+    static palavras + #106, #word106
+    static palavras + #107, #word107
+    static palavras + #108, #word108
+    static palavras + #109, #word109
+    static palavras + #110, #word110
+    static palavras + #111, #word111
+    static palavras + #112, #word112
+    static palavras + #113, #word113
+    static palavras + #114, #word114
+    static palavras + #115, #word115
+    static palavras + #116, #word116
+    static palavras + #117, #word117
+    static palavras + #118, #word118
+    static palavras + #119, #word119
+    static palavras + #120, #word120
+    static palavras + #121, #word121
+    static palavras + #122, #word122
+    static palavras + #123, #word123
+    static palavras + #124, #word124
+    static palavras + #125, #word125
+    static palavras + #126, #word126
+    static palavras + #127, #word127
+    static palavras + #128, #word128
+    static palavras + #129, #word129
+    static palavras + #130, #word130
+    static palavras + #131, #word131
+    static palavras + #132, #word132
+    static palavras + #133, #word133
+    static palavras + #134, #word134
+    static palavras + #135, #word135
+    static palavras + #136, #word136
+    static palavras + #137, #word137
+    static palavras + #138, #word138
+    static palavras + #139, #word139
+    static palavras + #140, #word140
+    static palavras + #141, #word141
+    static palavras + #142, #word142
+    static palavras + #143, #word143
+    static palavras + #144, #word144
+    static palavras + #145, #word145
+    static palavras + #146, #word146
+    static palavras + #147, #word147
+    static palavras + #148, #word148
+    static palavras + #149, #word149
+    static palavras + #150, #word150
+    static palavras + #151, #word151
+    static palavras + #152, #word152
+    static palavras + #153, #word153
+    static palavras + #154, #word154
+    static palavras + #155, #word155
+    static palavras + #156, #word156
+    static palavras + #157, #word157
+    static palavras + #158, #word158
+    static palavras + #159, #word159
+    static palavras + #160, #word160
+    static palavras + #161, #word161
+    static palavras + #162, #word162
+    static palavras + #163, #word163
+    static palavras + #164, #word164
+    static palavras + #165, #word165
+    static palavras + #166, #word166
+    static palavras + #167, #word167
+    static palavras + #168, #word168
+    static palavras + #169, #word169
+    static palavras + #170, #word170
+    static palavras + #171, #word171
+    static palavras + #172, #word172
+    static palavras + #173, #word173
+    static palavras + #174, #word174
+    static palavras + #175, #word175
+    static palavras + #176, #word176
+    static palavras + #177, #word177
+    static palavras + #178, #word178
+    static palavras + #179, #word179
+    static palavras + #180, #word180
+    static palavras + #181, #word181
+    static palavras + #182, #word182
+    static palavras + #183, #word183
+    static palavras + #184, #word184
+    static palavras + #185, #word185
+    static palavras + #186, #word186
+    static palavras + #187, #word187
+    static palavras + #188, #word188
+    static palavras + #189, #word189
+    static palavras + #190, #word190
+    static palavras + #191, #word191
+    static palavras + #192, #word192
+    static palavras + #193, #word193
+    static palavras + #194, #word194
+    static palavras + #195, #word195
+    static palavras + #196, #word196
+    static palavras + #197, #word197
+    static palavras + #198, #word198
+    static palavras + #199, #word199
+    static palavras + #200, #word200
+    static palavras + #201, #word201
+    static palavras + #202, #word202
+    static palavras + #203, #word203
+    static palavras + #204, #word204
+    static palavras + #205, #word205
+    static palavras + #206, #word206
+    static palavras + #207, #word207
+    static palavras + #208, #word208
+    static palavras + #209, #word209
+    static palavras + #210, #word210
+    static palavras + #211, #word211
+    static palavras + #212, #word212
+    static palavras + #213, #word213
+    static palavras + #214, #word214
+    static palavras + #215, #word215
+    static palavras + #216, #word216
+    static palavras + #217, #word217
+    static palavras + #218, #word218
+    static palavras + #219, #word219
+    static palavras + #220, #word220
+    static palavras + #221, #word221
+    static palavras + #222, #word222
+    static palavras + #223, #word223
+    static palavras + #224, #word224
+    static palavras + #225, #word225
+    static palavras + #226, #word226
+    static palavras + #227, #word227
+    static palavras + #228, #word228
+    static palavras + #229, #word229
+    static palavras + #230, #word230
+    static palavras + #231, #word231
+    static palavras + #232, #word232
+    static palavras + #233, #word233
+    static palavras + #234, #word234
+    static palavras + #235, #word235
+    static palavras + #236, #word236
+    static palavras + #237, #word237
+    static palavras + #238, #word238
+    static palavras + #239, #word239
+    static palavras + #240, #word240
+    static palavras + #241, #word241
+    static palavras + #242, #word242
+    static palavras + #243, #word243
+    static palavras + #244, #word244
+    static palavras + #245, #word245
+    static palavras + #246, #word246
+    static palavras + #247, #word247
+    static palavras + #248, #word248
+    static palavras + #249, #word249
+    static palavras + #250, #word250
+    static palavras + #251, #word251
+    static palavras + #252, #word252
+    static palavras + #253, #word253
+    static palavras + #254, #word254
+    static palavras + #255, #word255
+    static palavras + #256, #word256
+    static palavras + #257, #word257
+    static palavras + #258, #word258
+    static palavras + #259, #word259
+    static palavras + #260, #word260
+    static palavras + #261, #word261
+    static palavras + #262, #word262
+    static palavras + #263, #word263
+    static palavras + #264, #word264
+    static palavras + #265, #word265
+    static palavras + #266, #word266
+    static palavras + #267, #word267
+    static palavras + #268, #word268
+    static palavras + #269, #word269
+    static palavras + #270, #word270
+    static palavras + #271, #word271
+    static palavras + #272, #word272
+    static palavras + #273, #word273
+    static palavras + #274, #word274
+    static palavras + #275, #word275
+    static palavras + #276, #word276
+    static palavras + #277, #word277
+    static palavras + #278, #word278
+    static palavras + #279, #word279
+    static palavras + #280, #word280
+    static palavras + #281, #word281
+    static palavras + #282, #word282
+    static palavras + #283, #word283
+    static palavras + #284, #word284
+    static palavras + #285, #word285
+    static palavras + #286, #word286
+    static palavras + #287, #word287
+    static palavras + #288, #word288
+    static palavras + #289, #word289
+    static palavras + #290, #word290
+    static palavras + #291, #word291
+    static palavras + #292, #word292
+    static palavras + #293, #word293
+    static palavras + #294, #word294
+    static palavras + #295, #word295
+    static palavras + #296, #word296
+    static palavras + #297, #word297
+    static palavras + #298, #word298
+    static palavras + #299, #word299
+    static palavras + #300, #word300
+    static palavras + #301, #word301
+    static palavras + #302, #word302
+    static palavras + #303, #word303
+    static palavras + #304, #word304
+    static palavras + #305, #word305
+    static palavras + #306, #word306
+    static palavras + #307, #word307
+    static palavras + #308, #word308
+    static palavras + #309, #word309
+    static palavras + #310, #word310
+    static palavras + #311, #word311
+    static palavras + #312, #word312
+    static palavras + #313, #word313
+    static palavras + #314, #word314
+    static palavras + #315, #word315
+    static palavras + #316, #word316
+    static palavras + #317, #word317
+    static palavras + #318, #word318
+    static palavras + #319, #word319
+    static palavras + #320, #word320
+    static palavras + #321, #word321
+    static palavras + #322, #word322
+    static palavras + #323, #word323
+    static palavras + #324, #word324
+    static palavras + #325, #word325
+    static palavras + #326, #word326
+    static palavras + #327, #word327
+    static palavras + #328, #word328
+    static palavras + #329, #word329
+    static palavras + #330, #word330
+    static palavras + #331, #word331
+    static palavras + #332, #word332
+    static palavras + #333, #word333
+    static palavras + #334, #word334
+    static palavras + #335, #word335
+    static palavras + #336, #word336
+    static palavras + #337, #word337
+    static palavras + #338, #word338
+    static palavras + #339, #word339
+    static palavras + #340, #word340
+    static palavras + #341, #word341
+    static palavras + #342, #word342
+    static palavras + #343, #word343
+    static palavras + #344, #word344
+    static palavras + #345, #word345
+    static palavras + #346, #word346
+    static palavras + #347, #word347
+    static palavras + #348, #word348
+    static palavras + #349, #word349
+    static palavras + #350, #word350
+    static palavras + #351, #word351
+    static palavras + #352, #word352
+    static palavras + #353, #word353
+    static palavras + #354, #word354
+    static palavras + #355, #word355
+    static palavras + #356, #word356
+    static palavras + #357, #word357
+    static palavras + #358, #word358
+    static palavras + #359, #word359
+    static palavras + #360, #word360
+    static palavras + #361, #word361
+    static palavras + #362, #word362
+    static palavras + #363, #word363
+    static palavras + #364, #word364
+    static palavras + #365, #word365
+    static palavras + #366, #word366
+    static palavras + #367, #word367
+    static palavras + #368, #word368
+    static palavras + #369, #word369
+    static palavras + #370, #word370
+    static palavras + #371, #word371
+    static palavras + #372, #word372
+    static palavras + #373, #word373
+    static palavras + #374, #word374
+    static palavras + #375, #word375
+    static palavras + #376, #word376
+    static palavras + #377, #word377
+    static palavras + #378, #word378
+    static palavras + #379, #word379
+    static palavras + #380, #word380
+    static palavras + #381, #word381
+    static palavras + #382, #word382
+    static palavras + #383, #word383
+    static palavras + #384, #word384
+    static palavras + #385, #word385
+    static palavras + #386, #word386
+    static palavras + #387, #word387
+    static palavras + #388, #word388
+    static palavras + #389, #word389
+    static palavras + #390, #word390
+    static palavras + #391, #word391
+    static palavras + #392, #word392
+    static palavras + #393, #word393
+    static palavras + #394, #word394
+    static palavras + #395, #word395
+    static palavras + #396, #word396
+    static palavras + #397, #word397
+    static palavras + #398, #word398
+    static palavras + #399, #word399
+    static palavras + #400, #word400
+    static palavras + #401, #word401
+    static palavras + #402, #word402
+    static palavras + #403, #word403
+    static palavras + #404, #word404
+    static palavras + #405, #word405
+    static palavras + #406, #word406
+    static palavras + #407, #word407
+    static palavras + #408, #word408
+    static palavras + #409, #word409
+    static palavras + #410, #word410
+    static palavras + #411, #word411
+    static palavras + #412, #word412
+    static palavras + #413, #word413
+    static palavras + #414, #word414
+    static palavras + #415, #word415
+    static palavras + #416, #word416
+    static palavras + #417, #word417
+    static palavras + #418, #word418
+    static palavras + #419, #word419
+    static palavras + #420, #word420
+    static palavras + #421, #word421
+    static palavras + #422, #word422
+    static palavras + #423, #word423
+    static palavras + #424, #word424
+    static palavras + #425, #word425
+    static palavras + #426, #word426
+    static palavras + #427, #word427
+    static palavras + #428, #word428
+    static palavras + #429, #word429
+    static palavras + #430, #word430
+    static palavras + #431, #word431
+    static palavras + #432, #word432
+    static palavras + #433, #word433
+    static palavras + #434, #word434
+    static palavras + #435, #word435
+    static palavras + #436, #word436
+    static palavras + #437, #word437
+    static palavras + #438, #word438
+    static palavras + #439, #word439
+    static palavras + #440, #word440
+    static palavras + #441, #word441
+    static palavras + #442, #word442
+    static palavras + #443, #word443
+    static palavras + #444, #word444
+    static palavras + #445, #word445
+    static palavras + #446, #word446
+    static palavras + #447, #word447
+    static palavras + #448, #word448
+    static palavras + #449, #word449
+    static palavras + #450, #word450
+    static palavras + #451, #word451
+    static palavras + #452, #word452
+    static palavras + #453, #word453
+    static palavras + #454, #word454
+    static palavras + #455, #word455
+    static palavras + #456, #word456
+    static palavras + #457, #word457
+    static palavras + #458, #word458
+    static palavras + #459, #word459
+    static palavras + #460, #word460
+    static palavras + #461, #word461
+    static palavras + #462, #word462
+    static palavras + #463, #word463
+    static palavras + #464, #word464
+    static palavras + #465, #word465
+    static palavras + #466, #word466
+    static palavras + #467, #word467
+    static palavras + #468, #word468
+    static palavras + #469, #word469
+    static palavras + #470, #word470
+    static palavras + #471, #word471
+    static palavras + #472, #word472
+    static palavras + #473, #word473
+    static palavras + #474, #word474
+    static palavras + #475, #word475
+    static palavras + #476, #word476
+    static palavras + #477, #word477
+    static palavras + #478, #word478
+    static palavras + #479, #word479
+    static palavras + #480, #word480
+    static palavras + #481, #word481
+    static palavras + #482, #word482
+    static palavras + #483, #word483
+    static palavras + #484, #word484
+    static palavras + #485, #word485
+    static palavras + #486, #word486
+    static palavras + #487, #word487
+    static palavras + #488, #word488
+    static palavras + #489, #word489
+    static palavras + #490, #word490
+    static palavras + #491, #word491
+    static palavras + #492, #word492
+    static palavras + #493, #word493
+    static palavras + #494, #word494
+    static palavras + #495, #word495
+    static palavras + #496, #word496
+    static palavras + #497, #word497
+    static palavras + #498, #word498
+    static palavras + #499, #word499
+    static palavras + #500, #word500
+    static palavras + #501, #word501
+    static palavras + #502, #word502
+    static palavras + #503, #word503
+    static palavras + #504, #word504
+    static palavras + #505, #word505
+    static palavras + #506, #word506
+    static palavras + #507, #word507
+    static palavras + #508, #word508
+    static palavras + #509, #word509
+    static palavras + #510, #word510
+    static palavras + #511, #word511
+    static palavras + #512, #word512
+    static palavras + #513, #word513
+    static palavras + #514, #word514
+    static palavras + #515, #word515
+    static palavras + #516, #word516
+    static palavras + #517, #word517
+    static palavras + #518, #word518
+    static palavras + #519, #word519
+    static palavras + #520, #word520
+    static palavras + #521, #word521
+    static palavras + #522, #word522
+    static palavras + #523, #word523
+    static palavras + #524, #word524
+    static palavras + #525, #word525
+    static palavras + #526, #word526
+    static palavras + #527, #word527
+    static palavras + #528, #word528
+    static palavras + #529, #word529
+    static palavras + #530, #word530
+    static palavras + #531, #word531
+    static palavras + #532, #word532
+    static palavras + #533, #word533
+    static palavras + #534, #word534
+    static palavras + #535, #word535
+    static palavras + #536, #word536
+    static palavras + #537, #word537
+    static palavras + #538, #word538
+    static palavras + #539, #word539
+    static palavras + #540, #word540
+    static palavras + #541, #word541
+    static palavras + #542, #word542
+    static palavras + #543, #word543
+    static palavras + #544, #word544
+    static palavras + #545, #word545
+    static palavras + #546, #word546
+    static palavras + #547, #word547
+    static palavras + #548, #word548
+    static palavras + #549, #word549
+    static palavras + #550, #word550
+    static palavras + #551, #word551
+    static palavras + #552, #word552
+    static palavras + #553, #word553
+    static palavras + #554, #word554
+    static palavras + #555, #word555
+    static palavras + #556, #word556
+    static palavras + #557, #word557
+    static palavras + #558, #word558
+    static palavras + #559, #word559
+    static palavras + #560, #word560
+    static palavras + #561, #word561
+    static palavras + #562, #word562
+    static palavras + #563, #word563
+    static palavras + #564, #word564
+    static palavras + #565, #word565
+    static palavras + #566, #word566
+    static palavras + #567, #word567
+    static palavras + #568, #word568
+    static palavras + #569, #word569
+    static palavras + #570, #word570
+    static palavras + #571, #word571
+    static palavras + #572, #word572
+    static palavras + #573, #word573
+    static palavras + #574, #word574
+    static palavras + #575, #word575
+    static palavras + #576, #word576
+    static palavras + #577, #word577
+    static palavras + #578, #word578
+    static palavras + #579, #word579
+    static palavras + #580, #word580
+    static palavras + #581, #word581
+    static palavras + #582, #word582
+    static palavras + #583, #word583
+    static palavras + #584, #word584
+    static palavras + #585, #word585
+    static palavras + #586, #word586
+    static palavras + #587, #word587
+    static palavras + #588, #word588
+    static palavras + #589, #word589
+    static palavras + #590, #word590
+    static palavras + #591, #word591
+    static palavras + #592, #word592
+    static palavras + #593, #word593
+    static palavras + #594, #word594
+    static palavras + #595, #word595
+    static palavras + #596, #word596
+    static palavras + #597, #word597
+    static palavras + #598, #word598
+    static palavras + #599, #word599
+    static palavras + #600, #word600
+    static palavras + #601, #word601
+    static palavras + #602, #word602
+    static palavras + #603, #word603
+    static palavras + #604, #word604
+    static palavras + #605, #word605
+    static palavras + #606, #word606
+    static palavras + #607, #word607
+    static palavras + #608, #word608
+    static palavras + #609, #word609
+    static palavras + #610, #word610
+    static palavras + #611, #word611
+    static palavras + #612, #word612
+    static palavras + #613, #word613
+    static palavras + #614, #word614
+    static palavras + #615, #word615
+    static palavras + #616, #word616
+    static palavras + #617, #word617
+    static palavras + #618, #word618
+    static palavras + #619, #word619
+    static palavras + #620, #word620
+    static palavras + #621, #word621
+    static palavras + #622, #word622
+    static palavras + #623, #word623
+    static palavras + #624, #word624
+    static palavras + #625, #word625
+    static palavras + #626, #word626
+    static palavras + #627, #word627
+    static palavras + #628, #word628
+    static palavras + #629, #word629
+    static palavras + #630, #word630
+    static palavras + #631, #word631
+    static palavras + #632, #word632
+    static palavras + #633, #word633
+    static palavras + #634, #word634
+    static palavras + #635, #word635
+    static palavras + #636, #word636
+    static palavras + #637, #word637
+    static palavras + #638, #word638
+    static palavras + #639, #word639
+    static palavras + #640, #word640
+    static palavras + #641, #word641
+    static palavras + #642, #word642
+    static palavras + #643, #word643
+    static palavras + #644, #word644
+    static palavras + #645, #word645
+    static palavras + #646, #word646
+    static palavras + #647, #word647
+    static palavras + #648, #word648
+    static palavras + #649, #word649
+    static palavras + #650, #word650
+    static palavras + #651, #word651
+    static palavras + #652, #word652
+    static palavras + #653, #word653
+    static palavras + #654, #word654
+    static palavras + #655, #word655
+    static palavras + #656, #word656
+    static palavras + #657, #word657
+    static palavras + #658, #word658
+    static palavras + #659, #word659
+    static palavras + #660, #word660
+    static palavras + #661, #word661
+    static palavras + #662, #word662
+    static palavras + #663, #word663
+    static palavras + #664, #word664
+    static palavras + #665, #word665
+    static palavras + #666, #word666
+    static palavras + #667, #word667
+    static palavras + #668, #word668
+    static palavras + #669, #word669
+    static palavras + #670, #word670
+    static palavras + #671, #word671
+    static palavras + #672, #word672
+    static palavras + #673, #word673
+    static palavras + #674, #word674
+    static palavras + #675, #word675
+    static palavras + #676, #word676
+    static palavras + #677, #word677
+    static palavras + #678, #word678
+    static palavras + #679, #word679
+    static palavras + #680, #word680
+    static palavras + #681, #word681
+    static palavras + #682, #word682
+    static palavras + #683, #word683
+    static palavras + #684, #word684
+    static palavras + #685, #word685
+    static palavras + #686, #word686
+    static palavras + #687, #word687
+    static palavras + #688, #word688
+    static palavras + #689, #word689
+    static palavras + #690, #word690
+    static palavras + #691, #word691
+    static palavras + #692, #word692
+    static palavras + #693, #word693
+    static palavras + #694, #word694
+    static palavras + #695, #word695
+    static palavras + #696, #word696
+    static palavras + #697, #word697
+    static palavras + #698, #word698
+    static palavras + #699, #word699
+    static palavras + #700, #word700
+    static palavras + #701, #word701
+    static palavras + #702, #word702
+    static palavras + #703, #word703
+    static palavras + #704, #word704
+    static palavras + #705, #word705
+    static palavras + #706, #word706
+    static palavras + #707, #word707
+    static palavras + #708, #word708
+    static palavras + #709, #word709
+    static palavras + #710, #word710
+    static palavras + #711, #word711
+    static palavras + #712, #word712
+    static palavras + #713, #word713
+    static palavras + #714, #word714
+    static palavras + #715, #word715
+    static palavras + #716, #word716
+    static palavras + #717, #word717
+    static palavras + #718, #word718
+    static palavras + #719, #word719
+    static palavras + #720, #word720
+    static palavras + #721, #word721
+    static palavras + #722, #word722
+    static palavras + #723, #word723
+    static palavras + #724, #word724
+    static palavras + #725, #word725
+    static palavras + #726, #word726
+    static palavras + #727, #word727
+    static palavras + #728, #word728
+    static palavras + #729, #word729
+    static palavras + #730, #word730
+    static palavras + #731, #word731
+    static palavras + #732, #word732
+    static palavras + #733, #word733
+    static palavras + #734, #word734
+    static palavras + #735, #word735
+    static palavras + #736, #word736
+    static palavras + #737, #word737
+    static palavras + #738, #word738
+    static palavras + #739, #word739
+    static palavras + #740, #word740
+    static palavras + #741, #word741
+    static palavras + #742, #word742
+    static palavras + #743, #word743
+    static palavras + #744, #word744
+    static palavras + #745, #word745
+    static palavras + #746, #word746
+    static palavras + #747, #word747
+    static palavras + #748, #word748
+    static palavras + #749, #word749
+    static palavras + #750, #word750
+    static palavras + #751, #word751
+    static palavras + #752, #word752
+    static palavras + #753, #word753
+    static palavras + #754, #word754
+    static palavras + #755, #word755
+    static palavras + #756, #word756
+    static palavras + #757, #word757
+    static palavras + #758, #word758
+    static palavras + #759, #word759
+    static palavras + #760, #word760
+    static palavras + #761, #word761
+    static palavras + #762, #word762
+    static palavras + #763, #word763
+    static palavras + #764, #word764
+    static palavras + #765, #word765
+    static palavras + #766, #word766
+    static palavras + #767, #word767
+    static palavras + #768, #word768
+    static palavras + #769, #word769
+    static palavras + #770, #word770
+    static palavras + #771, #word771
+    static palavras + #772, #word772
+    static palavras + #773, #word773
+    static palavras + #774, #word774
+    static palavras + #775, #word775
+    static palavras + #776, #word776
+    static palavras + #777, #word777
+    static palavras + #778, #word778
+    static palavras + #779, #word779
+    static palavras + #780, #word780
+    static palavras + #781, #word781
+    static palavras + #782, #word782
+    static palavras + #783, #word783
+    static palavras + #784, #word784
+    static palavras + #785, #word785
+    static palavras + #786, #word786
+    static palavras + #787, #word787
+    static palavras + #788, #word788
+    static palavras + #789, #word789
+    static palavras + #790, #word790
+    static palavras + #791, #word791
+    static palavras + #792, #word792
+    static palavras + #793, #word793
+    static palavras + #794, #word794
+    static palavras + #795, #word795
+    static palavras + #796, #word796
+    static palavras + #797, #word797
+    static palavras + #798, #word798
+    static palavras + #799, #word799
+    static palavras + #800, #word800
+    static palavras + #801, #word801
+    static palavras + #802, #word802
+    static palavras + #803, #word803
+    static palavras + #804, #word804
+    static palavras + #805, #word805
+    static palavras + #806, #word806
+    static palavras + #807, #word807
+    static palavras + #808, #word808
+    static palavras + #809, #word809
+    static palavras + #810, #word810
+    static palavras + #811, #word811
+    static palavras + #812, #word812
+    static palavras + #813, #word813
+    static palavras + #814, #word814
+    static palavras + #815, #word815
+    static palavras + #816, #word816
+    static palavras + #817, #word817
+    static palavras + #818, #word818
+    static palavras + #819, #word819
+    static palavras + #820, #word820
+    static palavras + #821, #word821
+    static palavras + #822, #word822
+    static palavras + #823, #word823
+    static palavras + #824, #word824
+    static palavras + #825, #word825
+    static palavras + #826, #word826
+    static palavras + #827, #word827
+    static palavras + #828, #word828
+    static palavras + #829, #word829
+    static palavras + #830, #word830
+    static palavras + #831, #word831
+    static palavras + #832, #word832
+    static palavras + #833, #word833
+    static palavras + #834, #word834
+    static palavras + #835, #word835
+    static palavras + #836, #word836
+    static palavras + #837, #word837
+    static palavras + #838, #word838
+    static palavras + #839, #word839
+    static palavras + #840, #word840
+    static palavras + #841, #word841
+    static palavras + #842, #word842
+    static palavras + #843, #word843
+    static palavras + #844, #word844
+    static palavras + #845, #word845
+    static palavras + #846, #word846
+    static palavras + #847, #word847
+    static palavras + #848, #word848
+    static palavras + #849, #word849
+    static palavras + #850, #word850
+    static palavras + #851, #word851
+    static palavras + #852, #word852
+    static palavras + #853, #word853
+    static palavras + #854, #word854
+    static palavras + #855, #word855
+    static palavras + #856, #word856
+    static palavras + #857, #word857
+    static palavras + #858, #word858
+    static palavras + #859, #word859
+    static palavras + #860, #word860
+    static palavras + #861, #word861
+    static palavras + #862, #word862
+    static palavras + #863, #word863
+    static palavras + #864, #word864
+    static palavras + #865, #word865
+    static palavras + #866, #word866
+    static palavras + #867, #word867
+    static palavras + #868, #word868
+    static palavras + #869, #word869
+    static palavras + #870, #word870
+    static palavras + #871, #word871
+    static palavras + #872, #word872
+    static palavras + #873, #word873
+    static palavras + #874, #word874
+    static palavras + #875, #word875
+    static palavras + #876, #word876
+    static palavras + #877, #word877
+    static palavras + #878, #word878
+    static palavras + #879, #word879
+    static palavras + #880, #word880
+    static palavras + #881, #word881
+    static palavras + #882, #word882
+    static palavras + #883, #word883
+    static palavras + #884, #word884
+    static palavras + #885, #word885
+    static palavras + #886, #word886
+    static palavras + #887, #word887
+    static palavras + #888, #word888
+    static palavras + #889, #word889
+    static palavras + #890, #word890
+    static palavras + #891, #word891
+    static palavras + #892, #word892
+    static palavras + #893, #word893
+    static palavras + #894, #word894
+    static palavras + #895, #word895
+    static palavras + #896, #word896
+    static palavras + #897, #word897
+    static palavras + #898, #word898
+    static palavras + #899, #word899
+    static palavras + #900, #word900
+    static palavras + #901, #word901
+    static palavras + #902, #word902
+    static palavras + #903, #word903
+    static palavras + #904, #word904
+    static palavras + #905, #word905
+    static palavras + #906, #word906
+    static palavras + #907, #word907
+    static palavras + #908, #word908
+    static palavras + #909, #word909
+    static palavras + #910, #word910
+    static palavras + #911, #word911
+    static palavras + #912, #word912
+    static palavras + #913, #word913
+    static palavras + #914, #word914
+    static palavras + #915, #word915
+    static palavras + #916, #word916
+    static palavras + #917, #word917
+    static palavras + #918, #word918
+    static palavras + #919, #word919
+    static palavras + #920, #word920
+    static palavras + #921, #word921
+    static palavras + #922, #word922
+    static palavras + #923, #word923
+    static palavras + #924, #word924
+    static palavras + #925, #word925
+    static palavras + #926, #word926
+    static palavras + #927, #word927
+    static palavras + #928, #word928
+    static palavras + #929, #word929
+    static palavras + #930, #word930
+    static palavras + #931, #word931
+    static palavras + #932, #word932
+    static palavras + #933, #word933
+    static palavras + #934, #word934
+    static palavras + #935, #word935
+    static palavras + #936, #word936
+    static palavras + #937, #word937
+    static palavras + #938, #word938
+    static palavras + #939, #word939
+    static palavras + #940, #word940
+    static palavras + #941, #word941
+    static palavras + #942, #word942
+    static palavras + #943, #word943
+    static palavras + #944, #word944
+    static palavras + #945, #word945
+    static palavras + #946, #word946
+    static palavras + #947, #word947
+    static palavras + #948, #word948
+    static palavras + #949, #word949
+    static palavras + #950, #word950
+    static palavras + #951, #word951
+    static palavras + #952, #word952
+    static palavras + #953, #word953
+    static palavras + #954, #word954
+    static palavras + #955, #word955
+    static palavras + #956, #word956
+    static palavras + #957, #word957
+    static palavras + #958, #word958
+    static palavras + #959, #word959
+    static palavras + #960, #word960
+    static palavras + #961, #word961
+    static palavras + #962, #word962
+    static palavras + #963, #word963
+    static palavras + #964, #word964
+    static palavras + #965, #word965
+    static palavras + #966, #word966
+    static palavras + #967, #word967
+    static palavras + #968, #word968
+    static palavras + #969, #word969
+    static palavras + #970, #word970
+    static palavras + #971, #word971
+    static palavras + #972, #word972
+    static palavras + #973, #word973
+    static palavras + #974, #word974
+    static palavras + #975, #word975
+    static palavras + #976, #word976
+    static palavras + #977, #word977
+    static palavras + #978, #word978
+    static palavras + #979, #word979
+    static palavras + #980, #word980
+    static palavras + #981, #word981
+    static palavras + #982, #word982
+    static palavras + #983, #word983
+    static palavras + #984, #word984
+    static palavras + #985, #word985
+    static palavras + #986, #word986
+    static palavras + #987, #word987
+    static palavras + #988, #word988
+    static palavras + #989, #word989
+    static palavras + #990, #word990
+    static palavras + #991, #word991
+    static palavras + #992, #word992
+    static palavras + #993, #word993
+    static palavras + #994, #word994
+    static palavras + #995, #word995
+    static palavras + #996, #word996
+    static palavras + #997, #word997
+    static palavras + #998, #word998
+    static palavras + #999, #word999
+    static palavras + #1000, #word1000
+    static palavras + #1001, #word1001
+    static palavras + #1002, #word1002
+    static palavras + #1003, #word1003
+    static palavras + #1004, #word1004
+    static palavras + #1005, #word1005
+    static palavras + #1006, #word1006
+    static palavras + #1007, #word1007
+    static palavras + #1008, #word1008
+    static palavras + #1009, #word1009
+    static palavras + #1010, #word1010
+    static palavras + #1011, #word1011
+    static palavras + #1012, #word1012
+    static palavras + #1013, #word1013
+    static palavras + #1014, #word1014
+    static palavras + #1015, #word1015
+    static palavras + #1016, #word1016
+    static palavras + #1017, #word1017
+    static palavras + #1018, #word1018
+    static palavras + #1019, #word1019
+    static palavras + #1020, #word1020
+    static palavras + #1021, #word1021
+    static palavras + #1022, #word1022
+    static palavras + #1023, #word1023
+    static palavras + #1024, #word1024
+    static palavras + #1025, #word1025
+    static palavras + #1026, #word1026
+    static palavras + #1027, #word1027
+    static palavras + #1028, #word1028
+    static palavras + #1029, #word1029
+    static palavras + #1030, #word1030
+    static palavras + #1031, #word1031
+    static palavras + #1032, #word1032
+    static palavras + #1033, #word1033
+    static palavras + #1034, #word1034
+    static palavras + #1035, #word1035
+    static palavras + #1036, #word1036
+    static palavras + #1037, #word1037
+    static palavras + #1038, #word1038
+    static palavras + #1039, #word1039
+    static palavras + #1040, #word1040
+    static palavras + #1041, #word1041
+    static palavras + #1042, #word1042
+    static palavras + #1043, #word1043
+    static palavras + #1044, #word1044
+    static palavras + #1045, #word1045
+    static palavras + #1046, #word1046
+    static palavras + #1047, #word1047
+    static palavras + #1048, #word1048
+    static palavras + #1049, #word1049
+    static palavras + #1050, #word1050
+    static palavras + #1051, #word1051
+    static palavras + #1052, #word1052
+    static palavras + #1053, #word1053
+    static palavras + #1054, #word1054
+    static palavras + #1055, #word1055
+    static palavras + #1056, #word1056
+    static palavras + #1057, #word1057
+    static palavras + #1058, #word1058
+    static palavras + #1059, #word1059
+    static palavras + #1060, #word1060
+    static palavras + #1061, #word1061
+    static palavras + #1062, #word1062
+    static palavras + #1063, #word1063
+    static palavras + #1064, #word1064
+    static palavras + #1065, #word1065
+    static palavras + #1066, #word1066
+    static palavras + #1067, #word1067
+    static palavras + #1068, #word1068
+    static palavras + #1069, #word1069
+    static palavras + #1070, #word1070
+    static palavras + #1071, #word1071
+    static palavras + #1072, #word1072
+    static palavras + #1073, #word1073
+    static palavras + #1074, #word1074
+    static palavras + #1075, #word1075
+    static palavras + #1076, #word1076
+    static palavras + #1077, #word1077
+    static palavras + #1078, #word1078
+    static palavras + #1079, #word1079
+    static palavras + #1080, #word1080
+    static palavras + #1081, #word1081
+    static palavras + #1082, #word1082
+    static palavras + #1083, #word1083
+    static palavras + #1084, #word1084
+    static palavras + #1085, #word1085
+    static palavras + #1086, #word1086
+    static palavras + #1087, #word1087
+    static palavras + #1088, #word1088
+    static palavras + #1089, #word1089
+    static palavras + #1090, #word1090
+    static palavras + #1091, #word1091
+    static palavras + #1092, #word1092
+    static palavras + #1093, #word1093
+    static palavras + #1094, #word1094
+    static palavras + #1095, #word1095
+    static palavras + #1096, #word1096
+    static palavras + #1097, #word1097
+    static palavras + #1098, #word1098
+    static palavras + #1099, #word1099
+    static palavras + #1100, #word1100
+    static palavras + #1101, #word1101
+    static palavras + #1102, #word1102
+    static palavras + #1103, #word1103
+    static palavras + #1104, #word1104
+    static palavras + #1105, #word1105
+    static palavras + #1106, #word1106
+    static palavras + #1107, #word1107
+    static palavras + #1108, #word1108
+    static palavras + #1109, #word1109
+    static palavras + #1110, #word1110
+    static palavras + #1111, #word1111
+    static palavras + #1112, #word1112
+    static palavras + #1113, #word1113
+    static palavras + #1114, #word1114
+    static palavras + #1115, #word1115
+    static palavras + #1116, #word1116
+    static palavras + #1117, #word1117
+    static palavras + #1118, #word1118
+    static palavras + #1119, #word1119
+    static palavras + #1120, #word1120
+    static palavras + #1121, #word1121
+    static palavras + #1122, #word1122
+    static palavras + #1123, #word1123
+    static palavras + #1124, #word1124
+    static palavras + #1125, #word1125
+    static palavras + #1126, #word1126
+    static palavras + #1127, #word1127
+    static palavras + #1128, #word1128
+    static palavras + #1129, #word1129
+    static palavras + #1130, #word1130
+    static palavras + #1131, #word1131
+    static palavras + #1132, #word1132
+    static palavras + #1133, #word1133
+    static palavras + #1134, #word1134
+    static palavras + #1135, #word1135
+    static palavras + #1136, #word1136
+    static palavras + #1137, #word1137
+    static palavras + #1138, #word1138
+    static palavras + #1139, #word1139
+    static palavras + #1140, #word1140
+    static palavras + #1141, #word1141
+    static palavras + #1142, #word1142
+    static palavras + #1143, #word1143
+    static palavras + #1144, #word1144
+    static palavras + #1145, #word1145
+    static palavras + #1146, #word1146
+    static palavras + #1147, #word1147
+    static palavras + #1148, #word1148
+    static palavras + #1149, #word1149
+    static palavras + #1150, #word1150
+    static palavras + #1151, #word1151
+    static palavras + #1152, #word1152
+    static palavras + #1153, #word1153
+    static palavras + #1154, #word1154
+    static palavras + #1155, #word1155
+    static palavras + #1156, #word1156
+    static palavras + #1157, #word1157
+    static palavras + #1158, #word1158
+    static palavras + #1159, #word1159
+    static palavras + #1160, #word1160
+    static palavras + #1161, #word1161
+    static palavras + #1162, #word1162
+    static palavras + #1163, #word1163
+    static palavras + #1164, #word1164
+    static palavras + #1165, #word1165
+    static palavras + #1166, #word1166
+    static palavras + #1167, #word1167
+    static palavras + #1168, #word1168
+    static palavras + #1169, #word1169
+    static palavras + #1170, #word1170
+    static palavras + #1171, #word1171
+    static palavras + #1172, #word1172
+    static palavras + #1173, #word1173
+    static palavras + #1174, #word1174
+    static palavras + #1175, #word1175
+    static palavras + #1176, #word1176
+    static palavras + #1177, #word1177
+    static palavras + #1178, #word1178
+    static palavras + #1179, #word1179
+    static palavras + #1180, #word1180
+    static palavras + #1181, #word1181
+    static palavras + #1182, #word1182
+    static palavras + #1183, #word1183
+    static palavras + #1184, #word1184
+    static palavras + #1185, #word1185
+    static palavras + #1186, #word1186
+    static palavras + #1187, #word1187
+    static palavras + #1188, #word1188
+    static palavras + #1189, #word1189
+    static palavras + #1190, #word1190
+    static palavras + #1191, #word1191
+    static palavras + #1192, #word1192
+    static palavras + #1193, #word1193
+    static palavras + #1194, #word1194
+    static palavras + #1195, #word1195
+    static palavras + #1196, #word1196
+    static palavras + #1197, #word1197
+    static palavras + #1198, #word1198
+    static palavras + #1199, #word1199
+    static palavras + #1200, #word1200
+    static palavras + #1201, #word1201
+    static palavras + #1202, #word1202
+    static palavras + #1203, #word1203
+    static palavras + #1204, #word1204
+    static palavras + #1205, #word1205
+    static palavras + #1206, #word1206
+    static palavras + #1207, #word1207
+    static palavras + #1208, #word1208
+    static palavras + #1209, #word1209
+    static palavras + #1210, #word1210
+    static palavras + #1211, #word1211
+    static palavras + #1212, #word1212
+    static palavras + #1213, #word1213
+    static palavras + #1214, #word1214
+    static palavras + #1215, #word1215
+    static palavras + #1216, #word1216
+    static palavras + #1217, #word1217
+    static palavras + #1218, #word1218
+    static palavras + #1219, #word1219
+    static palavras + #1220, #word1220
+    static palavras + #1221, #word1221
+    static palavras + #1222, #word1222
+    static palavras + #1223, #word1223
+    static palavras + #1224, #word1224
+    static palavras + #1225, #word1225
+    static palavras + #1226, #word1226
+    static palavras + #1227, #word1227
+    static palavras + #1228, #word1228
+    static palavras + #1229, #word1229
+    static palavras + #1230, #word1230
+    static palavras + #1231, #word1231
+    static palavras + #1232, #word1232
+    static palavras + #1233, #word1233
+    static palavras + #1234, #word1234
+    static palavras + #1235, #word1235
+    static palavras + #1236, #word1236
+    static palavras + #1237, #word1237
+    static palavras + #1238, #word1238
+    static palavras + #1239, #word1239
+    static palavras + #1240, #word1240
+    static palavras + #1241, #word1241
+    static palavras + #1242, #word1242
+    static palavras + #1243, #word1243
+    static palavras + #1244, #word1244
+    static palavras + #1245, #word1245
+    static palavras + #1246, #word1246
+    static palavras + #1247, #word1247
+    static palavras + #1248, #word1248
+    static palavras + #1249, #word1249
+    static palavras + #1250, #word1250
+    static palavras + #1251, #word1251
+    static palavras + #1252, #word1252
+    static palavras + #1253, #word1253
+    static palavras + #1254, #word1254
+    static palavras + #1255, #word1255
+    static palavras + #1256, #word1256
+    static palavras + #1257, #word1257
+    static palavras + #1258, #word1258
+    static palavras + #1259, #word1259
+    static palavras + #1260, #word1260
+    static palavras + #1261, #word1261
+    static palavras + #1262, #word1262
+    static palavras + #1263, #word1263
+    static palavras + #1264, #word1264
+    static palavras + #1265, #word1265
+    static palavras + #1266, #word1266
+    static palavras + #1267, #word1267
+    static palavras + #1268, #word1268
+    static palavras + #1269, #word1269
+    static palavras + #1270, #word1270
+    static palavras + #1271, #word1271
+    static palavras + #1272, #word1272
+    static palavras + #1273, #word1273
+    static palavras + #1274, #word1274
+    static palavras + #1275, #word1275
+    static palavras + #1276, #word1276
+    static palavras + #1277, #word1277
+    static palavras + #1278, #word1278
+    static palavras + #1279, #word1279
+    static palavras + #1280, #word1280
+    static palavras + #1281, #word1281
+    static palavras + #1282, #word1282
+    static palavras + #1283, #word1283
+    static palavras + #1284, #word1284
+    static palavras + #1285, #word1285
+    static palavras + #1286, #word1286
+    static palavras + #1287, #word1287
+    static palavras + #1288, #word1288
+    static palavras + #1289, #word1289
+    static palavras + #1290, #word1290
+    static palavras + #1291, #word1291
+    static palavras + #1292, #word1292
+    static palavras + #1293, #word1293
+    static palavras + #1294, #word1294
+    static palavras + #1295, #word1295
+    static palavras + #1296, #word1296
+    static palavras + #1297, #word1297
+    static palavras + #1298, #word1298
+    static palavras + #1299, #word1299
+    static palavras + #1300, #word1300
+    static palavras + #1301, #word1301
+    static palavras + #1302, #word1302
+    static palavras + #1303, #word1303
+    static palavras + #1304, #word1304
+    static palavras + #1305, #word1305
+    static palavras + #1306, #word1306
+    static palavras + #1307, #word1307
+    static palavras + #1308, #word1308
+    static palavras + #1309, #word1309
+    static palavras + #1310, #word1310
+    static palavras + #1311, #word1311
+    static palavras + #1312, #word1312
+    static palavras + #1313, #word1313
+    static palavras + #1314, #word1314
+    static palavras + #1315, #word1315
+    static palavras + #1316, #word1316
+    static palavras + #1317, #word1317
+    static palavras + #1318, #word1318
+    static palavras + #1319, #word1319
+    static palavras + #1320, #word1320
+    static palavras + #1321, #word1321
+    static palavras + #1322, #word1322
+    static palavras + #1323, #word1323
+    static palavras + #1324, #word1324
+    static palavras + #1325, #word1325
+    static palavras + #1326, #word1326
+    static palavras + #1327, #word1327
+    static palavras + #1328, #word1328
+    static palavras + #1329, #word1329
+    static palavras + #1330, #word1330
+    static palavras + #1331, #word1331
+    static palavras + #1332, #word1332
+    static palavras + #1333, #word1333
+    static palavras + #1334, #word1334
+    static palavras + #1335, #word1335
+    static palavras + #1336, #word1336
+    static palavras + #1337, #word1337
+    static palavras + #1338, #word1338
+    static palavras + #1339, #word1339
+    static palavras + #1340, #word1340
+    static palavras + #1341, #word1341
+    static palavras + #1342, #word1342
+    static palavras + #1343, #word1343
+    static palavras + #1344, #word1344
+    static palavras + #1345, #word1345
+    static palavras + #1346, #word1346
+    static palavras + #1347, #word1347
+    static palavras + #1348, #word1348
+    static palavras + #1349, #word1349
+    static palavras + #1350, #word1350
+    static palavras + #1351, #word1351
+    static palavras + #1352, #word1352
+    static palavras + #1353, #word1353
+    static palavras + #1354, #word1354
+    static palavras + #1355, #word1355
+    static palavras + #1356, #word1356
+    static palavras + #1357, #word1357
+    static palavras + #1358, #word1358
+    static palavras + #1359, #word1359
+    static palavras + #1360, #word1360
+    static palavras + #1361, #word1361
+    static palavras + #1362, #word1362
+    static palavras + #1363, #word1363
+    static palavras + #1364, #word1364
+    static palavras + #1365, #word1365
+    static palavras + #1366, #word1366
+    static palavras + #1367, #word1367
+    static palavras + #1368, #word1368
+    static palavras + #1369, #word1369
+    static palavras + #1370, #word1370
+    static palavras + #1371, #word1371
+    static palavras + #1372, #word1372
+    static palavras + #1373, #word1373
+    static palavras + #1374, #word1374
+    static palavras + #1375, #word1375
+    static palavras + #1376, #word1376
+    static palavras + #1377, #word1377
+    static palavras + #1378, #word1378
+    static palavras + #1379, #word1379
+    static palavras + #1380, #word1380
+    static palavras + #1381, #word1381
+    static palavras + #1382, #word1382
+    static palavras + #1383, #word1383
+    static palavras + #1384, #word1384
+    static palavras + #1385, #word1385
+    static palavras + #1386, #word1386
+    static palavras + #1387, #word1387
+    static palavras + #1388, #word1388
+    static palavras + #1389, #word1389
+    static palavras + #1390, #word1390
+    static palavras + #1391, #word1391
+    static palavras + #1392, #word1392
+    static palavras + #1393, #word1393
+    static palavras + #1394, #word1394
+    static palavras + #1395, #word1395
+    static palavras + #1396, #word1396
+    static palavras + #1397, #word1397
+    static palavras + #1398, #word1398
+    static palavras + #1399, #word1399
+    static palavras + #1400, #word1400
+    static palavras + #1401, #word1401
+    static palavras + #1402, #word1402
+    static palavras + #1403, #word1403
+    static palavras + #1404, #word1404
+    static palavras + #1405, #word1405
+    static palavras + #1406, #word1406
+    static palavras + #1407, #word1407
+    static palavras + #1408, #word1408
+    static palavras + #1409, #word1409
+    static palavras + #1410, #word1410
+    static palavras + #1411, #word1411
+    static palavras + #1412, #word1412
+    static palavras + #1413, #word1413
+    static palavras + #1414, #word1414
+    static palavras + #1415, #word1415
+    static palavras + #1416, #word1416
+    static palavras + #1417, #word1417
+    static palavras + #1418, #word1418
+    static palavras + #1419, #word1419
+    static palavras + #1420, #word1420
+    static palavras + #1421, #word1421
+    static palavras + #1422, #word1422
+    static palavras + #1423, #word1423
+    static palavras + #1424, #word1424
+    static palavras + #1425, #word1425
+    static palavras + #1426, #word1426
+    static palavras + #1427, #word1427
+    static palavras + #1428, #word1428
+    static palavras + #1429, #word1429
+    static palavras + #1430, #word1430
+    static palavras + #1431, #word1431
+    static palavras + #1432, #word1432
+    static palavras + #1433, #word1433
+    static palavras + #1434, #word1434
+    static palavras + #1435, #word1435
+    static palavras + #1436, #word1436
+    static palavras + #1437, #word1437
+    static palavras + #1438, #word1438
+    static palavras + #1439, #word1439
+    static palavras + #1440, #word1440
+    static palavras + #1441, #word1441
+    static palavras + #1442, #word1442
+    static palavras + #1443, #word1443
+    static palavras + #1444, #word1444
+    static palavras + #1445, #word1445
+    static palavras + #1446, #word1446
+    static palavras + #1447, #word1447
+    static palavras + #1448, #word1448
+    static palavras + #1449, #word1449
+    static palavras + #1450, #word1450
+    static palavras + #1451, #word1451
+    static palavras + #1452, #word1452
+    static palavras + #1453, #word1453
+    static palavras + #1454, #word1454
+    static palavras + #1455, #word1455
+    static palavras + #1456, #word1456
+    static palavras + #1457, #word1457
+    static palavras + #1458, #word1458
+    static palavras + #1459, #word1459
+    static palavras + #1460, #word1460
+    static palavras + #1461, #word1461
+    static palavras + #1462, #word1462
+    static palavras + #1463, #word1463
+    static palavras + #1464, #word1464
+    static palavras + #1465, #word1465
+    static palavras + #1466, #word1466
+    static palavras + #1467, #word1467
+    static palavras + #1468, #word1468
+    static palavras + #1469, #word1469
+    static palavras + #1470, #word1470
+    static palavras + #1471, #word1471
+    static palavras + #1472, #word1472
+    static palavras + #1473, #word1473
+    static palavras + #1474, #word1474
+    static palavras + #1475, #word1475
+    static palavras + #1476, #word1476
+    static palavras + #1477, #word1477
+    static palavras + #1478, #word1478
+    static palavras + #1479, #word1479
+    static palavras + #1480, #word1480
+    static palavras + #1481, #word1481
+    static palavras + #1482, #word1482
+    static palavras + #1483, #word1483
+    static palavras + #1484, #word1484
+    static palavras + #1485, #word1485
+    static palavras + #1486, #word1486
+    static palavras + #1487, #word1487
+    static palavras + #1488, #word1488
+    static palavras + #1489, #word1489
+    static palavras + #1490, #word1490
+    static palavras + #1491, #word1491
+    static palavras + #1492, #word1492
+    static palavras + #1493, #word1493
+    static palavras + #1494, #word1494
+    static palavras + #1495, #word1495
+    static palavras + #1496, #word1496
+    static palavras + #1497, #word1497
+    static palavras + #1498, #word1498
+    static palavras + #1499, #word1499
+    static palavras + #1500, #word1500
+    static palavras + #1501, #word1501
+    static palavras + #1502, #word1502
+    static palavras + #1503, #word1503
+    static palavras + #1504, #word1504
+    static palavras + #1505, #word1505
+    static palavras + #1506, #word1506
+    static palavras + #1507, #word1507
+    static palavras + #1508, #word1508
+    static palavras + #1509, #word1509
+    static palavras + #1510, #word1510
+    static palavras + #1511, #word1511
+    static palavras + #1512, #word1512
+    static palavras + #1513, #word1513
+    static palavras + #1514, #word1514
+    static palavras + #1515, #word1515
+    static palavras + #1516, #word1516
+    static palavras + #1517, #word1517
+    static palavras + #1518, #word1518
+    static palavras + #1519, #word1519
+    static palavras + #1520, #word1520
+    static palavras + #1521, #word1521
+    static palavras + #1522, #word1522
+    static palavras + #1523, #word1523
+    static palavras + #1524, #word1524
+    static palavras + #1525, #word1525
+    static palavras + #1526, #word1526
+    static palavras + #1527, #word1527
+    static palavras + #1528, #word1528
+    static palavras + #1529, #word1529
+    static palavras + #1530, #word1530
+    static palavras + #1531, #word1531
+    static palavras + #1532, #word1532
+    static palavras + #1533, #word1533
+    static palavras + #1534, #word1534
+    static palavras + #1535, #word1535
+    static palavras + #1536, #word1536
+    static palavras + #1537, #word1537
+    static palavras + #1538, #word1538
+    static palavras + #1539, #word1539
+    static palavras + #1540, #word1540
+    static palavras + #1541, #word1541
+    static palavras + #1542, #word1542
+    static palavras + #1543, #word1543
+    static palavras + #1544, #word1544
+    static palavras + #1545, #word1545
+    static palavras + #1546, #word1546
+    static palavras + #1547, #word1547
+    static palavras + #1548, #word1548
+    static palavras + #1549, #word1549
+    static palavras + #1550, #word1550
+    static palavras + #1551, #word1551
+    static palavras + #1552, #word1552
+    static palavras + #1553, #word1553
+    static palavras + #1554, #word1554
+    static palavras + #1555, #word1555
+    static palavras + #1556, #word1556
+    static palavras + #1557, #word1557
+    static palavras + #1558, #word1558
+    static palavras + #1559, #word1559
+    static palavras + #1560, #word1560
+    static palavras + #1561, #word1561
+    static palavras + #1562, #word1562
+    static palavras + #1563, #word1563
+    static palavras + #1564, #word1564
+    static palavras + #1565, #word1565
+    static palavras + #1566, #word1566
+    static palavras + #1567, #word1567
+    static palavras + #1568, #word1568
+    static palavras + #1569, #word1569
+    static palavras + #1570, #word1570
+    static palavras + #1571, #word1571
+    static palavras + #1572, #word1572
+    static palavras + #1573, #word1573
+    static palavras + #1574, #word1574
+    static palavras + #1575, #word1575
+    static palavras + #1576, #word1576
+    static palavras + #1577, #word1577
+    static palavras + #1578, #word1578
 
 jmp fim_outras_definicoes
 
