@@ -38,8 +38,8 @@ jmp outras_definicoes
 ; --- Mensagens ---
 mensagem : string "Digite Algo"
 apaga_mensagem: string "           "
-msg_vitoria: string "venceu!"
-msg_derrota: string "perdeu :("
+msg_vitoria: string "Venceu!"
+msg_derrota: string "Perdeu :("
 msg_resposta: string "A resposta era:"
 
 jmp main
