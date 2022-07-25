@@ -476,20 +476,20 @@ apagarquadradinho:
 ;-----------------------------------------------------------------------------------------------
 outras_definicoes:
 ;; --- Guardando desenho do quadradinho ---
-    quadradinhoPosition : var #1 ; Posicao em que um quadradinho sera impresso
+    quadradinhoPosition : var #1
 
     quadradinho : var #8
-    static quadradinho + #0, #2 ; se
-    static quadradinho + #1, #1 ; horizontal
-    static quadradinho + #2, #3 ; sd
+    static quadradinho + #0, #2 ;  se
+    static quadradinho + #1, #1 ;  horizontal
+    static quadradinho + #2, #3 ;  sd
     ;38  espacos para o proximo caractere
-    static quadradinho + #3, #0 ; vertical
+    static quadradinho + #3, #0 ;  vertical
     ;2  espacos para o proximo caractere
-    static quadradinho + #4, #0 ; vertical
+    static quadradinho + #4, #0 ;  vertical
     ;38  espacos para o proximo caractere
-    static quadradinho + #5, #4 ; ie
-    static quadradinho + #6, #1 ; horizontal
-    static quadradinho + #7, #5 ; id
+    static quadradinho + #5, #4 ;  ie
+    static quadradinho + #6, #1 ;  horizontal
+    static quadradinho + #7, #5 ;  id
 
     quadradinhoGaps : var #8
     static quadradinhoGaps + #0, #0
