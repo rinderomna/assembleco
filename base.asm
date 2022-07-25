@@ -1,10 +1,18 @@
+;--- ASSEMBLECO ---
 
 Letra: var #1		; Contem a letra que foi digitada
 Rand: var #1        ; Número que será coletado pesualeatoriamente
-quadradinhoPosition : var #1
+quadradinhoPosition : var #1 ; Posicao em que um quadradinho sera impresso
 
-jmp definicoes
-fim_definicoes:
+palavraResposta: var #1 ; Palavra Resposta do Jogo
+
+; Definindo numero de palavras---
+n_palavras: var #1
+    loadn r0, #5
+    store n_palavras, r0
+
+jmp outras_definicoes
+fim_outras_definicoes:
 
 ; --- Guardando Cores na Memoria ---
     Verde: var #1
@@ -23,6 +31,8 @@ fim_definicoes:
     store Branco, r3 
 ; --- Fim de Guardar as cores na memória ---
 
+
+; Mensagens ---
 mensagem : string "Digite Algo"
 apaga_mensagem: string "           "
 
@@ -40,14 +50,12 @@ main:
     loadn r1, #apaga_mensagem
     call Imprimestr
 
-  ;  load r2, Rand
-  ;  loadn r3, #5
-  ;  mod r2, r2, r3
+    call sortearPalavra
 
-   ; loadn r4, #palavras
-
-   ; add r1, r4, r2 ; r1 contem agora endereco da palavra aleatoria
-   ; call Imprimestr
+    loadn r0, #490
+    load  r1, palavraResposta
+    load  r2, Branco
+    call  Imprimestr
     
 	halt
 
@@ -56,6 +64,29 @@ main:
 ;---- Fim do Programa Principal -----
 	
 ;---- Inicio das Subrotinas -----
+
+sortearPalavra:
+    push R0
+    push R1
+    push R2
+
+    load R0, Rand
+    load R1, n_palavras
+    mod R0, R0, R1 ; rand = rand % n_palavras
+
+    loadn R2, #palavras
+
+    add R2, R2, R0 ; R2 contém o endereco do endereco da palavra sorteda
+
+    loadi R0, R2
+
+    store palavraResposta, R0
+
+    pop R2
+    pop R1
+    pop R0
+
+    RTS
 
 printCaixinhas:
     push R0
@@ -256,7 +287,7 @@ apagarquadradinho:
   rts
 
 ;-----------------------------------------------------------------------------------------------
-definicoes:
+outras_definicoes:
 
 quadradinhoPosition : var #1
 
@@ -283,20 +314,19 @@ quadradinhoGaps : var #8
   static quadradinhoGaps + #6, #0
   static quadradinhoGaps + #7, #0
 
-;palavras: #var 5
-    ;word0: string "ABACO"
-   ; word1: string "BOLAS"
-   ; word2: string "LIRIO"
-    ;word3: string "PAULO"
-   ; word4: string "FELIZ"
-     
-   ; static palavras + #0, #word0
-   ; static palavras + #1, #word1
-   ; static palavras + #2, #word2
-   ; static palavras + #3, #word3
-   ; static palavras + #4, #word4
+palavras: var #5
+    word0: string "ABACO"
+    word1: string "BOLAS"
+    word2: string "LIRIO"
+    word3: string "PAULO"
+    word4: string "FELIZ"
+    static palavras + #0, #word0
+    static palavras + #1, #word1
+    static palavras + #2, #word2
+    static palavras + #3, #word3
+    static palavras + #4, #word4
 
-jmp fim_definicoes
+jmp fim_outras_definicoes
 
 ;-------------------------------------------------------------------------------------------------
 fim_do_codigo:
