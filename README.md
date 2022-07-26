@@ -12,7 +12,7 @@ O programa começa com uma tela inicial e aguarda o usuário digitar alguma tecl
 
 ![Início de uma partida](images/1.png)
 
-A partida inicia com 6 linhas 5 quadrados, uma para cada tentativa. A primeira delas é feita sem nenhuma dica na primeira linha de quadrados. Basta digitar a palavra (com letras minúsculas) e apertar ENTER para confirmar. Caso queira apagar, utiliza-se o '1'. 
+A partida inicia com 6 linhas 5 quadrados, uma para cada tentativa. A primeira delas é feita sem nenhuma dica na primeira linha de quadrados. Basta digitar a palavra e apertar ENTER para confirmar. Caso queira apagar, utiliza-se o '1'. 
 
 ![Primeira tentativa da rodada teste](images/2.png)
 
@@ -20,7 +20,7 @@ Após confirmar a tentativa, ela é impressa com dicas de cores. No exemplo acim
 
 ![Vitória](images/3.png)
 
-No exemplo, a partida for vencida na quarta tentativa, revelando a palavra-resposta "beira". Ao final da partida, é perguntado ao usuário se ele gostaria de jogar uma nova rodada. Caso queira, ele deve escrever 's' dentro do quadrado na resposta e confirmar com ENTER. Caso não, basta escrever qualquer outra letra, como 'n', e também confirmar com ENTER. Antes da confirmação, é possível também apagar com a tecla '1'.
+No exemplo, a partida for vencida na quinta tentativa, revelando a palavra-resposta "clara". Ao final da partida, é perguntado ao jogador se ele gostaria de jogar uma nova rodada. Caso queira, ele deve escrever 's' dentro do quadrado na resposta e confirmar com ENTER. Caso não, basta escrever qualquer outra letra, como 'n', e também confirmar com ENTER. Antes da confirmação, é possível também apagar com a tecla '1'.
 
 ![Derrota](images/4.png)
 
