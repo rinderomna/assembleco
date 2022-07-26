@@ -50,16 +50,16 @@ main:
     call printTelaInicial    
     call digLetra ; --> Gera número pseudoaleatorio para sortear palavra depois
     
-    ;;;; -----
+    ;; Loop de Partidas
     de_novo:
         ;; Limpar a tela e sortear palavra
-        call clearScreen
+        call limparTela
         call sortearPalavra
         
         ;; Imprimir as 6 linhas de 5 caixinhas do jogo
         call printCaixinhas
 
-        ;; Loop de jogo
+        ;; Loop de uma Partida
 
         loadn r4, #160 ; constante para pular para proxima linha
         loadn r3, #6   ; quantidade de repeticoes do loop
@@ -112,6 +112,7 @@ main:
             call Imprimestr
         nao_derrota:
 
+        ;; Ler se o usuario quer continuar jogando
         call denovo_pergunta
 
         loadn r0, #sim_ou_nao
@@ -132,10 +133,10 @@ main:
 definir_coloracao:
     push fr
     push r0 ; <livre>
-    push r1 
-    push r2 
+    push r1 ; <livre>
+    push r2 ; <livre>
     push r3 ; endereco da letra chute
-    push r4 ; endereco da letra resposta (nunca guardar nele)
+    push r4 ; endereco da letra resposta
     push r5 ; i
     push r6 ; j
     push r7 ; <livre>
@@ -154,7 +155,7 @@ definir_coloracao:
         loadi r1, r1  ;r1 = palavraChute[i]
         loadi r2, r2  ;r2 = palavraResposta[i]
 
-        cmp r1, r2
+        cmp r1, r2 ; palavraChute[i] == palavraResposta[i] ? seguir : loop continue
         jne nao_sao_iguais_em_mesma_posicao
             loadn r1, #coloracao 
             loadn r2, #checado_na_resposta 
@@ -164,8 +165,8 @@ definir_coloracao:
             add r2, r2, r5 ;r2 = &checado_na_resposta[i]
             add r7, r7, r5 ;r7 = &checado_no_chute[i]
 
-            loadn r0, #2
-            storei r1, r0 ; coloracao[i] = VERDE(2)
+            loadn r0, #2  
+            storei r1, r0 ; coloracao[i] = 2 {VERDE}
 
             loadn r0, #1
             storei r2, r0 ; checado_na_resposta[i] = True
@@ -184,10 +185,10 @@ definir_coloracao:
     loadn r5, #0
     definir_coloracao_loop2_externo:
         loadn r1, #checado_no_chute
-        add r1, r1, r5
-        loadi r1, r1
-        loadn r0, #1
-        cmp r1, r0
+        add r1, r1, r5  ; r1 = &checado_no_chute[i]
+        loadi r1, r1    ; r1 = checado_no_chute[i]
+        loadn r0, #1    ; r0 = True
+        cmp r1, r0      ; checado_no_chute[i] == True ? loop continue : seguir
         jeq definir_coloracao_loop2_externo_continue
         ;;;; ----
 
@@ -195,10 +196,10 @@ definir_coloracao:
         loadn r6, #0
         definir_coloracao_loop2_interno:
             loadn r1, #checado_na_resposta
-            add r1, r1, r6
-            loadi r1, r1
-            loadn r0, #1
-            cmp r1, r0
+            add r1, r1, r6 ; r1 = &checado_na_resposta[j]
+            loadi r1, r1   ; r1 = checado_na_resposta[j]
+            loadn r0, #1   ; r0 = True
+            cmp r1, r0     ; checado_na_resposta[i] == True ? loop continue : seguir
             jeq definir_coloracao_loop2_interno_continue
             ;;;; ----
 
@@ -208,22 +209,22 @@ definir_coloracao:
             loadi r1, r1 ; r1 = palavraChute[i]
             loadi r2, r2 ; r2 = palavraResposta[j]
 
-            cmp r1, r2
+            cmp r1, r2 ; palavraChute[i] == palavraResposta[j] ? seguir : loop continue
             jne definir_coloracao_loop2_interno_continue
 
                 loadn r1, #coloracao
                 loadn r2, #checado_no_chute
                 loadn r7, #checado_na_resposta
 
-                add r1, r1, r5
-                add r2, r2, r5
-                add r7, r7, r6
+                add r1, r1, r5 ; r1 = &coloracao[i]
+                add r2, r2, r5 ; r2 = &checado_no_chute[i]
+                add r7, r7, r6 ; r3 = &checa_na_resposta[j]
 
-                loadn r0, #1
+                loadn r0, #1   ; const True ou AMARELO
 
-                storei r1, r0 ;(Amarelo)
-                storei r2, r0 ;(True)
-                storei r7, r0 ;(True)
+                storei r1, r0 ; coloracao[i] = 1 {AMARELO}
+                storei r2, r0 ; checado_no_chute[i] = True
+                storei r7, r0 ; checa_na_resposta[j] = True
         
         definir_coloracao_loop2_interno_continue:
             inc r6
@@ -590,21 +591,8 @@ digLetra:	; Espera que uma tecla seja digitada e salva na variavel global "Letra
 	pop r1
 	pop r0
 	pop fr
-	rts	
 
-imprimeLetraColorida: ;; ROTINA PARA IMPRESSAO DE LETRA COLORIDA
-    push r0 ; posicao na tela 
-    push r1 ; letra 
-    push r2 ; cor
-
-    add r1, r1, r2
-	outchar r1, r0 ; Imprime letra na posição em r0
-
-    pop r2
-    pop r1
-    pop r0
-
-    rts
+	rts
 
 Imprimestr:		;  Rotina de Impresao de Mensagens:    
 				; r0 = Posicao da tela que o primeiro caractere da mensagem sera' impresso
@@ -666,7 +654,7 @@ printTelaInicial:
   pop R0
   rts
 
-clearScreen:
+limparTela:
 	push fr
 	push r5
 	push r6
@@ -674,10 +662,10 @@ clearScreen:
 	loadn r5, #1200
 	loadn r6, #' '
 	
-	clearScreenLoop:
+	limparTelaLoop:
 		dec r5
 		outchar r6, r5
-		jnz clearScreenLoop
+		jnz limparTelaLoop
 	
 	pop r6
 	pop r5
