@@ -4,6 +4,7 @@
 msg_vitoria: string "Venceu!"
 msg_derrota: string "Perdeu :("
 msg_resposta: string "A resposta era:"
+msg_denovo: string "De novo? (s/*)"
 
 Letra: var #1		    ; Contem a letra que foi digitada
 Rand: var #1            ; Número que será coletado pesualeatoriamente
@@ -42,65 +43,80 @@ jmp main
 ;---- Inicio do Programa Principal -----
 
 main:
-    call printTelaInicial
-
-    call digLetra
-
-    call clearScreen
-
-    call sortearPalavra
+   ;; Imprimir Tela Inicial e aguardar usuario teclar algo
+    call printTelaInicial    
+    call digLetra ; --> Gera número pseudoaleatorio para sortear palavra depois
     
-    call printCaixinhas
-    
-    loadn r4, #160 ; constante para pular para próxima linha
-    loadn r3, #6   ; quantidade de repeticoes do loop
-    loadn r7, #131 ; posicao da primeira caixinha da primeira linha
+    ;;;; -----
+    de_novo:
+        ;; Limpar a tela e sortear palavra
+        call clearScreen
+        call sortearPalavra
+        
+        ;; Imprimir as 6 linhas de 5 caixinhas do jogo
+        call printCaixinhas
 
-    loadn r5, #1 ; const TRUE
+        ;; Loop de jogo
 
-    main_loop:
-        call lerPalavra
+        loadn r4, #160 ; constante para pular para proxima linha
+        loadn r3, #6   ; quantidade de repeticoes do loop
+        loadn r7, #131 ; posicao da primeira caixinha da primeira linha (pos)
+        loadn r5, #1   ; bool TRUE
+        
+        main_loop:
+            ;; Ler palavra chute
+            call lerPalavra
 
-        loadn r1, #palavraChute
-        call definir_coloracao ;zera variaveis de checagem
-        call checa_resposta
-        call imprime_com_dicas
+            ;; Checar com resposta e imprimir dicas coloridas
+            loadn r1, #palavraChute
+            call definir_coloracao ;zera variaveis de checagem
+            call checa_resposta
+            call imprime_com_dicas
 
-        load r2, certo
-        cmp r2, r5
-        jeq vitoria
+            load r2, certo
+            cmp r2, r5
+            jeq vitoria
 
-        add r7, r7, r4 ; pos += 160
-    dec r3
-    jnz main_loop
+            add r7, r7, r4 ; pos += 160 (proxima linha de caixinhas)
+        dec r3
+        jnz main_loop
 
-    jmp fim_jogo
-    vitoria:
-        loadn r0, #1170
-        loadn r1, #msg_vitoria
-        load r2, Verde
-        call Imprimestr
+        jmp fim_jogo
+        vitoria:
+            loadn r0, #1121
+            loadn r1, #msg_vitoria
+            load r2, Verde
+            call Imprimestr
 
-    fim_jogo:
+        fim_jogo:
 
-    loadn r0, #0
-    cmp r3, r0
-    jne nao_derrota
-        loadn r0, #1090
-        loadn r1, #msg_derrota
-        load r2, Vermelho
-        call Imprimestr
+        loadn r0, #0
+        cmp r3, r0
+        jne nao_derrota
+            loadn r0, #1041
+            loadn r1, #msg_derrota
+            load r2, Vermelho
+            call Imprimestr
 
-        loadn r0, #1130
-        loadn r1, #msg_resposta
-        load r2, Branco
-        call Imprimestr
+            loadn r0, #1081
+            loadn r1, #msg_resposta
+            load r2, Branco
+            call Imprimestr
 
-        loadn r0, #1170
-        load r1, palavraResposta
-        load r2, Verde
-        call Imprimestr
-    nao_derrota:
+            loadn r0, #1121
+            load r1, palavraResposta
+            load r2, Verde
+            call Imprimestr
+        nao_derrota:
+
+        call denovo_pergunta
+
+        loadn r0, #sim_ou_nao
+        loadi r0, r0
+        loadn r1, #'s'
+        cmp r0, r1
+        jeq de_novo
+    ;;;; -----------
 
 	halt
 
@@ -353,8 +369,6 @@ imprime_com_dicas:
 
     rts
 
-; ###
-
 lerPalavra:  ; Rotina que recebe uma palavraChute (r7 <- posicao primeira letra)
     ;salva as variaveis anteriores e inicializa as novas
     push fr    ; Protege o registrador de flags
@@ -443,9 +457,6 @@ lerPalavra:  ; Rotina que recebe uma palavraChute (r7 <- posicao primeira letra)
     pop r0
     pop fr
     rts    
-      
-;------------------------    
-; ###
 
 sortearPalavra:
     push R0
@@ -470,6 +481,30 @@ sortearPalavra:
     pop R0
 
     RTS
+
+denovo_pergunta:
+    push r0
+    push r1
+    push r2
+    push r7
+
+    loadn r0, #1063
+    loadn r1, #msg_denovo
+    load r2, Branco
+    call Imprimestr
+
+    loadn r0, #1108
+    store quadradinhoPosition, r0
+    call printquadradinho
+
+    loadn r7, #1149
+    call lerSimouNao
+
+    pop r7
+    pop r2
+    pop r1
+    pop r0
+    rts
 
 printCaixinhas:
     push R0
@@ -686,40 +721,6 @@ printquadradinho:
   pop R0
   rts
 
-apagarquadradinho:
-  push R0
-  push R1
-  push R2
-  push R3
-  push R4
-  push R5
-
-  loadn R0, #3967
-  loadn R1, #quadradinhoGaps
-  load R2, quadradinhoPosition
-  loadn R3, #8 ;tamanho quadradinho
-  loadn R4, #0 ;incremetador
-
-  apagarquadradinhoLoop:
-    add R5,R1,R4
-    loadi R5, R5
-
-    add R2,R2,R5
-    outchar R0, R2
-
-    inc R2
-     inc R4
-     cmp R3, R4
-    jne apagarquadradinhoLoop
-
-  pop R5
-  pop R4
-  pop R3
-  pop R2
-  pop R1
-  pop R0
-  rts
-
 zerar_variaveis_de_checagem:
     push fr
     push r0
@@ -756,6 +757,99 @@ zerar_variaveis_de_checagem:
 
     rts
 
+;;;;
+
+lerSimouNao:  ; Rotina que recebe uma palavraChute (r7 <- posicao primeira letra)
+    ;salva as variaveis anteriores e inicializa as novas
+    push fr    ; Protege o registrador de flags
+    push r0    ; Recebe letra digitada
+    push r1    ; codigo do '1' (nosso backspace)
+    push r2    ; Contador de letras para o vetor que armazena a palavra
+    push r3    ; ponteiro para palavra
+    push r4    ; palavra[r3+r2]
+    push r5    ; Tamanho maximo da palavra
+    push r6    ; Cor a imprimir
+    push r7    ; Posicao inicial de escrita #
+
+    loadn r1, #'1'              ; codigo '1' (nosso backspace)
+    loadn r2, #0                ; inicia r2 = 0
+    loadn r3, #sim_ou_nao       ; ponteiro para palavra
+    loadn r5, #1                ; Tamanho maximo da palavra
+    ;----------------
+    lerSimouNao_Loop:
+        call digLetra    ; Espera que uma tecla seja digitada e salva na variavel global "Letra"
+
+        load r0, Letra        ; Letra --> r0
+
+        ;; Primeiro ver se é enter para nao contar
+        loadn r6, #13 ;; enter(13)
+        cmp r0, r6
+        jeq lerSimouNao_Loop
+        ;; --------------------------------------
+
+        cmp r0, r1          ;comparacao se r0 eh '1' (nosso backspace)
+        jne lerSimouNao_segue        ; se for '1' (nosso backspace)
+
+        eh_backspace:
+            loadn r6, #0  ; para comparar com 0
+            cmp r2, r6    ; r2 == 0?
+            jeq lerSimouNao_Loop ; se for, volta para o loop
+
+            dec r2 ; se nao for 0, decrementa tamanho da palavra
+            dec r7 ;    e decrementa 4 na posicao de escrita
+                dec r7
+                dec r7
+                dec r7
+            loadn r0, #' ' ; e vai escrever espaço em cima da ultima posicao 
+            outchar r0, r7 ; imprime na posicao
+
+            jmp lerSimouNao_Loop
+        lerSimouNao_segue:
+        
+        add r4, r3, r2
+        storei r4, r0        ; palavra[r2] = Letra
+        inc r2
+            ; add r0, r0, r6 ; coloca cor
+        outchar r0, r7 ; imprime na posicao
+        inc r7       ; aumenta 4 na posicao de escrita
+            inc r7
+            inc r7
+            inc r7
+
+            cmp r2, r5            ; verifica se r2 = 5 (tam maximo)
+        jne lerSimouNao_Loop      ; Se for, sai, senao goto loop!!
+        ;; eh o tamanho maximo -> aguardar enter ou '1' (nosso backspace)
+
+        loadn r6, #13 ;; enter(13)
+        lerSimouNaor_loop_enter:
+            call digLetra    ; Espera que uma tecla seja digitada e salva na variavel global "Letra"
+
+            load r0, Letra        ; Letra --> r0
+            cmp r0, r6          ;comparacao se r0 eh Enter (13)
+            jeq lerSimouNao_End
+
+            cmp r0, r1  ; Eh '1' (nosso backspace)?
+            jeq eh_backspace
+        jmp lerSimouNaor_loop_enter
+          
+    lerSimouNao_End:
+    ; Poe um \0 no final da palavra pra poder imprimir e testar!!
+    loadn r0, #0
+    add r4, r3, r2
+    storei r4, r0        ; palavra[r2] = /0
+    pop r7
+    pop r6
+    pop r5
+    pop r4
+    pop r3
+    pop r2
+    pop r1
+    pop r0
+    pop fr
+    rts    
+
+;;;;
+
 ;-----------------------------------------------------------------------------------------------
 outras_definicoes:
 
@@ -769,6 +863,9 @@ outras_definicoes:
     certo: var #1 ; booleano para dizer se a palavra bateu ou não
     checado_na_resposta: var #5
     checado_no_chute: var #5
+
+;; --- sim ou nao para de novo ---
+    sim_ou_nao: var #2
 
 ;; --- Guardando desenho do quadradinho ---
     quadradinhoPosition : var #1
