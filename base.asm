@@ -42,7 +42,7 @@ jmp main
 ;---- Inicio do Programa Principal -----
 
 main:
-    call printScreenScreen
+    call printTelaInicial
 
     call digLetra
 
@@ -602,7 +602,7 @@ ImprimestrSai:
 	pop r0
 	rts		; retorno da subrotina
 
-printScreenScreen:
+printTelaInicial:
   push R0
   push R1
   push R2
@@ -612,7 +612,7 @@ printScreenScreen:
   loadn R1, #0
   loadn R2, #1200
 
-  printScreenScreenLoop:
+  printTelaInicialLoop:
 
     add R3,R0,R1
     loadi R3, R3
@@ -620,7 +620,7 @@ printScreenScreen:
     inc R1
     cmp R1, R2
 
-    jne printScreenScreenLoop
+    jne printTelaInicialLoop
 
   pop R3
   pop R2
