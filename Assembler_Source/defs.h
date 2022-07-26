@@ -39,6 +39,7 @@
 #define ROTL_CODE               22
 #define ROTR_CODE               23
 #define CMP_CODE                24
+#define CMPZ_CODE               98
 #define BRA_CODE                25
 #define BEQ_CODE                26
 #define BNE_CODE                27
@@ -145,6 +146,7 @@
 #define LNOT            "010101"
 #define SHIFT           "010000"
 #define CMP             "010110"
+#define CMPZ            "010111"
 
 /* FLOW CONTROL Instructions: */
 #define BRA             "000001"
@@ -233,6 +235,7 @@
 #define ROTR_STR                "ROTR"
 
 #define CMP_STR                 "CMP"
+#define CMPZ_STR                "CMPZ"
 
 /* BRA */
 #define BRA_STR                 "BRA"
