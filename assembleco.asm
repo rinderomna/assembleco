@@ -554,6 +554,13 @@ digLetra:	; Espera que uma tecla seja digitada e salva na variavel global "Letra
 	push r2
     push r3
     push r4
+    push r5
+    push r6
+    push r7
+
+    loadn r5, #32
+    loadn r6, #'A'
+    loadn r7, #'Z'
 
 	loadn r1, #255	; Se nao digitar nada vem 255
 	loadn r2, #0	; Logo que programa a FPGA o inchar vem 0
@@ -571,6 +578,20 @@ digLetra:	; Espera que uma tecla seja digitada e salva na variavel global "Letra
 		cmp r0, r2			;compara r0 com 0
 		jeq digLetra_Loop	; Le novamente pois Logo que programa a FPGA o inchar vem 0
 
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+    ;; To lower
+    cmp r0, r6 ;; Letra comparar com 'A'
+    jle no_to_lower ;; Seguir se Letra >= A
+    cmp r0, r7 ;; Letra comparar com 'Z'
+    jgr no_to_lower ;; Seguir se Letra <= 'Z'
+    ;---
+
+    add r0, r0, r5 ;; Letra += 32 (to lower)
+
+    ;;
+    no_to_lower:
+    ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
+
 	store Letra, r0			; Salva a tecla na variavel global "Letra"
 	
     digLetra_Loop2:
@@ -582,6 +603,9 @@ digLetra:	; Espera que uma tecla seja digitada e salva na variavel global "Letra
 
     store Rand, r3 ; Retorna um número pseudoaleatorio entre 0 e (n_palavras - 1)
 
+    pop r7
+    pop r6
+    pop r5
     pop r4
     pop r3
 	pop r2
