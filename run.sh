@@ -1,3 +1,3 @@
 #!/bin/bash
-./montador base.asm base.mif
-./sim base.mif charmap.mif
+./montador assembleco.asm assembleco.mif
+./sim assembleco.mif charmap.mif
