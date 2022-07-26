@@ -11,9 +11,6 @@ Rand: var #1            ; Número que será coletado pesualeatoriamente
 palavraResposta: var #1 ; Palavra Resposta do Jogo (endereco)
 palavraChute: var #6    ; Palavra que o usuário vai tentar (conteudo)
 
-jmp outras_definicoes
-    fim_outras_definicoes:
-
 ;; --- Guardando Cores na Memoria ---
     Verde: var #1
     Vermelho: var #1
@@ -842,7 +839,6 @@ lerSimouNao:  ; Rotina que recebe uma palavraChute (r7 <- posicao primeira letra
 ;;;;
 
 ;-----------------------------------------------------------------------------------------------
-outras_definicoes:
 
 ;; --- Vetor de coloracao ---
     ;; 0 -> vermelho
@@ -5309,8 +5305,6 @@ Screen : var #1200
     static palavras + #1576, #word1576
     static palavras + #1577, #word1577
     static palavras + #1578, #word1578
-
-jmp fim_outras_definicoes
 
 ;-------------------------------------------------------------------------------------------------
 fim_do_codigo:
