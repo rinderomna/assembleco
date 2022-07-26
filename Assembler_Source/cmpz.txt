@@ -1,0 +1,16 @@
+cmp = 010110|rx|ry|xxx|x -> FR <- COND
+cmpz= faz a mesma coisa só que não usa o ry
+cmpz= 010111|rx|xxx|xxx|x
+
+Instrucoes de 1 argumento e 1 linha : instr () -> [...]
+
+case CMPZ_CODE :
+                    str_tmp1 = parser_GetItem_s();
+                    val1 = BuscaRegistrador(str_tmp1);
+                    free(str_tmp1);
+                    str_tmp1 = ConverteRegistrador(val1);
+                    sprintf(str_msg,"%s%s0000000",CMPZ,str_tmp1);
+                    free(str_tmp1);
+                    parser_Write_Inst(str_msg,end_cnt);
+                    end_cnt += 1;
+                    break;

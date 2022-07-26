@@ -298,6 +298,7 @@ void DetectarLabels(void)
                 break;
 
             /* Instrucoes de 1 argumento e 1 linha : instr () -> [...] */
+            case CMPZ_CODE :
             case INCHAR_CODE :
             case INC_CODE :
             case DEC_CODE :
@@ -1141,6 +1142,16 @@ void MontarInstrucoes(void)
                     end_cnt += 1;
                     break;
                     
+                case CMPZ_CODE :
+                    str_tmp1 = parser_GetItem_s();
+                    val1 = BuscaRegistrador(str_tmp1);
+                    free(str_tmp1);
+                    str_tmp1 = ConverteRegistrador(val1);
+                    sprintf(str_msg,"%s%s0000000",CMPZ,str_tmp1);
+                    free(str_tmp1);
+                    parser_Write_Inst(str_msg,end_cnt);
+                    end_cnt += 1;
+                    break;
                 /* ==============
                    Bra +/- T
                    ==============
@@ -2350,6 +2361,10 @@ int BuscaInstrucao(char * nome)
     else if (strcmp(str_tmp,CMP_STR) == 0)
     {
         return CMP_CODE;
+    }
+    else if (strcmp(str_tmp,CMPZ_STR) == 0)
+    {
+        return CMPZ_CODE;
     }
     else if (strcmp(str_tmp,BRA_STR) == 0)
     {
