@@ -34,6 +34,9 @@ jmp outras_definicoes
     loadn r0, #0
     store certo, r0 
 
+;; --- Inicializando Rand com 0 --- ^
+    store Rand, r0
+
 ;; --- Definindo numero de palavras ---
     loadn r0, #1579
     store n_palavras, r0
@@ -43,7 +46,7 @@ jmp main
 ;---- Inicio do Programa Principal -----
 
 main:
-   ;; Imprimir Tela Inicial e aguardar usuario teclar algo
+    ;; Imprimir Tela Inicial e aguardar usuario teclar algo
     call printTelaInicial    
     call digLetra ; --> Gera número pseudoaleatorio para sortear palavra depois
     
@@ -556,7 +559,7 @@ digLetra:	; Espera que uma tecla seja digitada e salva na variavel global "Letra
 
 	loadn r1, #255	; Se nao digitar nada vem 255
 	loadn r2, #0	; Logo que programa a FPGA o inchar vem 0
-    loadn r3, #0    ; numero aleatorio
+    load r3, Rand    ; numero aleatorio (comeca com valor enterior)
 
     load r4, n_palavras
 
