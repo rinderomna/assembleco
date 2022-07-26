@@ -20,7 +20,7 @@ Após confirmar a tentativa, ela é impressa com dicas de cores. No exemplo acim
 
 ![Vitória](images/3.png)
 
-No exemplo, a partida for vencida na quarta tentativa. Ao final da partida, é perguntado ao usuário se ele gostaria de jogar uma nova rodada. Caso queira, ele deve escrever 's' dentro do quadrado na resposta e confirmar com ENTER. Caso não, base escrever qualquer outra letra, como 'n', e também confirmar com ENTER. Anter da confirmação, pode-se também apagar com a tecla '1'.
+No exemplo, a partida for vencida na quarta tentativa, revelando a palavra-resposta "beira". Ao final da partida, é perguntado ao usuário se ele gostaria de jogar uma nova rodada. Caso queira, ele deve escrever 's' dentro do quadrado na resposta e confirmar com ENTER. Caso não, base escrever qualquer outra letra, como 'n', e também confirmar com ENTER. Anter da confirmação, pode-se também apagar com a tecla '1'.
 
 ![Derrota](images/4.png)
 
