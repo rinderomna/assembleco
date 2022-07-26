@@ -7,7 +7,7 @@ msg_resposta: string "A resposta era:"
 msg_denovo: string "De novo? (s/*)"
 
 Letra: var #1		    ; Contem a letra que foi digitada
-Rand: var #1            ; Número que será coletado pesualeatoriamente
+Rand: var #1            ; Número que será coletado pseudoaleatoriamente
 palavraResposta: var #1 ; Palavra Resposta do Jogo (endereco)
 palavraChute: var #6    ; Palavra que o usuário vai tentar (conteudo)
 
