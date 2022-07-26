@@ -1,6 +1,6 @@
 cmp = 010110|rx|ry|xxx|x -> FR <- COND
 cmpz= faz a mesma coisa só que não usa o ry
-cmpz= 010111|rx|xxx|xxx|x
+cmpz= 010111|rx|xxx|xxx|x ->  FR <- COND
 
 Instrucoes de 1 argumento e 1 linha : instr () -> [...]
 
