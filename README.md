@@ -43,6 +43,6 @@ A derrota ocorre quanto o jogador não consegue adivinhar a palavra-resposta den
 ## 3.2. Modificar o Montador para que reconheça a nova Instrução
 ## 3.3. Modificar o Manual do Processador, descrevendo sua nova Instrução (e alteraçao na Arquitetura)
 
-# Video do Youtube Demonstrando Jogo e Explicando Modificações no Processador
+# Vídeo do Youtube Demonstrando Jogo e Explicando Modificações no Processador
 [Link para o vídeo](https://youtu.be/sQ_09y4LZx0)
 
