@@ -34,7 +34,7 @@ No exemplo, a partida for vencida na quinta tentativa, revelando a palavra-respo
 A derrota ocorre quanto o jogador não consegue adivinhar a palavra-resposta dentro das 6 tentativas. Neste caso, a resposta é revelada.
 
 # Item 2 - Construir o Hardware do Processador em VHDL na FPGA
-O código das instruções faltantes no VHDL do processador (cpu.vhd) foi sendo completado ao longo das aulas da disciplina e se encontra na Pasta 'PROCESSADOR MODIFICADO', dentro da pasta da DE0-CV. 
+O código das instruções faltantes no VHDL do processador (cpu.vhd) foi sendo completado ao longo das aulas da disciplina e se encontra na Pasta 'PROCESSADOR FPGA MODIFICADO', dentro da pasta da DE0-CV. 
 
 # Item 3 - Nova Instrução cmpz (comparar com zero)
 
