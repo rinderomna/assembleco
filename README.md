@@ -19,7 +19,7 @@ O programa começa com uma tela inicial e aguarda o usuário digitar alguma tecl
 
 ![Início de uma partida](images/1.png)
 
-A partida inicia com 6 linhas 5 quadrados, uma para cada tentativa. A primeira delas é feita sem nenhuma dica na primeira linha de quadrados. Basta digitar a palavra e apertar ENTER para confirmar. Caso queira apagar, utiliza-se o '1'. 
+A partida inicia com 6 linhas de 5 quadrados, uma para cada tentativa. A primeira delas é feita sem nenhuma dica na primeira linha de quadrados. Basta digitar a palavra e apertar ENTER para confirmar. Caso queira apagar, utiliza-se o '1'. 
 
 ![Primeira tentativa da rodada teste](images/2.png)
 
