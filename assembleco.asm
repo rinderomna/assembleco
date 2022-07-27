@@ -207,7 +207,7 @@ definir_coloracao:
         jne definir_coloracao_loop1 
     definir_coloracao_fim_loop1:
     
-    ;; Loop2 (externo e interno): Checar letras em outras posicoes ("Testa-Amrelo-ou-Vermelho")
+    ;; Loop2 (externo e interno): Checar letras em outras posicoes ("Testa-Amarelo-ou-Vermelho")
     ;; r5 := i & r6 := j
     loadn r5, #0 ;; i = 0 (inicializacao da variavel de controle do loop2 externo)
     definir_coloracao_loop2_externo:
