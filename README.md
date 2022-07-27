@@ -6,12 +6,12 @@
 | Theo da Mota dos Santos           | 10691331  |
 
 # Item 1 - Assembleco
-<div style="text-align: right, width: 200px">
+<p style="text-align: right; width: 200px">
 Inspirados no famoso jogo Wordle, especialmente em sua versão chamada ["Letreco" (desenvolvida por Gabriel Toschi)](https://github.com/gabtoschi/letreco), decidimos criar uma versão em Assembly para o Processador do ICMC. O jogo consiste na advinhação de uma palavra de 5 letras dentre 6 tentativas. Para auxiliar, são dadas dicas sobre a existência e a posição das letras em cada tentativa. Para tanto, elas são coloridas com:
 * Vermelho: indicando que a letra não está presente na palavra-resposta
 * Amarelo: indicando que a letra está presente na palavra-resposta, mas em outra posição
 * Verde: indicando que a letra está presente na palavra-resposta na mesma posição
-
+</p>
 Obs.: mesmo em caso de repetição de letras, cada uma delas conta apenas uma vez. Ou seja, se a palavra-resposta for "forma" e a tentativa for "bolos", a primeira letra 'o' de "bolos" ficará verde, mas a segunda ficará vermelha.
 
 ![Tela inicial do jogo](images/tela_inicial.png)
@@ -33,7 +33,7 @@ No exemplo, a partida for vencida na quinta tentativa, revelando a palavra-respo
 ![Derrota](images/4.png)
 
 A derrota ocorre quanto o jogador não consegue adivinhar a palavra-resposta dentro das 6 tentativas. Neste caso, a resposta é revelada.
-</div>
+
 # Item 2 - Construir o Hardware do Processador em VHDL na FPGA
 
 # Item 3 - Implementar Nova Instrução na Arquitetura do Processador
