@@ -35,7 +35,7 @@ A derrota ocorre quanto o jogador não consegue adivinhar a palavra-resposta den
 
 # Item 2 - Construir o Hardware do Processador em VHDL na FPGA
 
-# Item 3 - Implementar Nova Instrução na Arquitetura do Processador
+# Item 3 - Nova Instrução cmpz (comparar com zero)
 
 ![Arquitetura Modificada](images/arquitetura.png)
 
