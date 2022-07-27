@@ -38,11 +38,13 @@ O código das instruções faltantes no VHDL do processador (cpu.vhd) foi sendo 
 
 # Item 3 - Nova Instrução cmpz (comparar com zero)
 
-![Arquitetura Modificada](images/arquitetura.png)
-
 ## 3.1. Modificar o projeto na FPGA
 ## 3.2. Modificar o Montador para que reconheça a nova Instrução
 ## 3.3. Modificar o Manual do Processador, descrevendo sua nova Instrução (e alteraçao na Arquitetura)
+O novo manual se encontra em formato .odp dentro da pasta 'PROCESSADOR FPGA MODIFICADO'. As principais diferenças foram a necessidade de manda uma constante '0' para o MUX4 e a especificação de formato da nova instrução CMPZ.
+
+![Arquitetura Modificada](images/arquitetura.png)
+![Nova Instrução](images/novo_opcode.png)
 
 # Vídeo Demonstrando Jogo e Explicando Nova Instrução
 [Link para o vídeo](https://youtu.be/sQ_09y4LZx0)
