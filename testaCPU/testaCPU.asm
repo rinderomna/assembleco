@@ -146,22 +146,22 @@ CallSai:
 	push r1
 	pop r2
 	outchar r2, r0		; Printa P na linha 30
-	
-	
+
+;; Testa CMPZ
+    loadn r0, #32
+    loadn r1, #'Q'
+
+    loadn r3, #0
+    cmpz r3
+    jeq cmpz_deu_certo
+        loadn r2, #'X'
+        outchar r2, r0
+        jmp Fim
+    cmpz_deu_certo:
+        outchar r3, r0
 	
 Fim:	
 	halt
 
-	
-Dado : var #1  ; O comando VAR aloca bytes de memoria e associa o primeiro byte ao LABEL
-static Dado + #0, #'B'
-
-	
-	
-	
-	
-	
-	
-	
-	
-	
+Dado: var #1  ; O comando VAR aloca bytes de memoria e associa o primeiro byte ao LABEL
+static Dado + #0, #'B'	
