@@ -37,6 +37,8 @@ A derrota ocorre quanto o jogador não consegue adivinhar a palavra-resposta den
 
 # Item 3 - Implementar Nova Instrução na Arquitetura do Processador
 
+![Arquitetura Modificada](images/arquitetura.png)
+
 ## 3.1. Modificar o projeto na FPGA
 ## 3.2. Modificar o Montador para que reconheça a nova Instrução
 ## 3.3. Modificar o Manual do Processador, descrevendo sua nova Instrução (e alteraçao na Arquitetura)
