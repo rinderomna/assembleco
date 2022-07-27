@@ -34,14 +34,18 @@ No exemplo, a partida for vencida na quinta tentativa, revelando a palavra-respo
 A derrota ocorre quanto o jogador não consegue adivinhar a palavra-resposta dentro das 6 tentativas. Neste caso, a resposta é revelada.
 
 # Item 2 - Construir o Hardware do Processador em VHDL na FPGA
+O código das instruções faltantes no VHDL do processador (cpu.vhd) foi sendo completado ao longo das aulas da disciplina e se encontra na Pasta 'PROCESSADOR FPGA MODIFICADO', dentro da pasta da DE0-CV. 
 
 # Item 3 - Nova Instrução cmpz (comparar com zero)
-
-![Arquitetura Modificada](images/arquitetura.png)
 
 ## 3.1. Modificar o projeto na FPGA
 ## 3.2. Modificar o Montador para que reconheça a nova Instrução
 ## 3.3. Modificar o Manual do Processador, descrevendo sua nova Instrução (e alteraçao na Arquitetura)
+O novo manual se encontra em formato .odp dentro da pasta 'PROCESSADOR FPGA MODIFICADO'. As principais diferenças foram a necessidade de manda uma constante '0' para o MUX4 e a especificação de formato da nova instrução CMPZ.
 
-# Video do Youtube Demonstrando Jogo e Explicando Modificações no Processador
+![Arquitetura Modificada](images/arquitetura.png)
+![Nova Instrução](images/novo_opcode.png)
+
+# Vídeo Demonstrando Jogo e Explicando Nova Instrução
+[Link para o vídeo](https://youtu.be/sQ_09y4LZx0)
 
