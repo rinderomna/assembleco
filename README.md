@@ -34,7 +34,7 @@ No exemplo, a partida for vencida na quinta tentativa, revelando a palavra-respo
 A derrota ocorre quanto o jogador não consegue adivinhar a palavra-resposta dentro das 6 tentativas. Neste caso, a resposta é revelada.
 
 # Item 2 - Construir o Hardware do Processador em VHDL na FPGA
-O código das instruções faltantes no VHDL do processador (cpu.vhd) foi sendo completado ao longo das aulas da disciplina e se encontra na Pasta 'PROCESSADOR FPGA MODIFICADO', dentro da pasta da DE0-CV. 
+O código das instruções faltantes no VHDL do processador (cpu.vhd) foi sendo completado ao longo das aulas da disciplina e se encontra na pasta 'PROCESSADOR FPGA MODIFICADO', dentro da pasta da DE0-CV. 
 
 # Item 3 - Nova Instrução CMPZ (comparar com zero)
 A modificação que propomos para a arquitetura é uma nova intrução: a CMPZ, que recebe como parâmetro um único regitrador e compara seu valor com a constante '0'. A vantagem seria economizar um registrador na hora de comparar um valor com 0, o que é muito comum. Para o reconhecimento da nova instrução, foi modificado o montador (que se encontra na pasta 'MONTADOR MODIFICADO') e também o VHDL do processador (que está junto com os arquivos da DE0_CV na pasta 'PROCESSADOR FPGA MODIFICADO'). O novo manual se encontra em formato .odp dentro da pasta 'PROCESSADOR FPGA MODIFICADO'. As principais diferenças foram a necessidade de mandar uma constante '0' para o MUX4 e a especificação de formato da nova instrução CMPZ.
