@@ -1,4 +1,12 @@
-;--- ASSEMBLECO ---
+; -------------- | ASSEMBLECO |  -----------------
+
+;|--------------- GRUPO POC-2 -------------------|
+;|   Aluno                           |   N°USP   |
+;|-----------------------------------|-----------|
+;| Hélio Nogueira Cardoso            | 10310227  |
+;| Paulo Henrique dos Santos Almeida | 12543926  |
+;| Theo da Mota dos Santos           | 10691331  |
+;|-----------------------------------------------|
 
 ; --- Mensagens ---
 msg_vitoria: string "Venceu!"
@@ -6,8 +14,10 @@ msg_derrota: string "Perdeu :("
 msg_resposta: string "A resposta era:"
 msg_denovo: string "De novo? (s/*)"
 
+; --- Alguma 'Variaveis' ----
+
 Letra: var #1		    ; Contem a letra que foi digitada
-Rand: var #1            ; Número que será coletado pseudoaleatoriamente
+Rand: var #1            ; Numero que sera coletado pseudoaleatoriamente
 palavraResposta: var #1 ; Palavra Resposta do Jogo (endereco)
 palavraChute: var #6    ; Palavra que o usuário vai tentar (conteudo)
 
@@ -27,16 +37,16 @@ palavraChute: var #6    ; Palavra que o usuário vai tentar (conteudo)
     store Amarelo, r2
     store Branco, r3 
 
-;; --- chute vazio inicialmente falso ---
-    loadn r0, #0
-    store certo, r0 
+;; --- Chute Vazio Inicialmente Incorreto ---
+    loadn r0, #0    
+    store certo, r0                         ; certo = False
 
 ;; --- Inicializando Rand com 0 --- ^
-    store Rand, r0
+    store Rand, r0                          ; Rand = 0
 
 ;; --- Definindo numero de palavras ---
     loadn r0, #1579
-    store n_palavras, r0
+    store n_palavras, r0                    ; n_palavras = 1579
 
 jmp main
 
@@ -50,22 +60,21 @@ main:
     ;; Loop de Partidas
     de_novo:
         ;; Limpar a tela e sortear palavra
-        call printHintsScreen
-        call sortearPalavra
+        call printHintsScreen              ; Tela que indica como apagar e enviar palavra
+        call sortearPalavra                
         
-        ;; Imprimir as 6 linhas de 5 caixinhas do jogo
+        ;; Imprimir as 6 linhas de 5 caixinhas da partida
         call printCaixinhas
 
         ;; Loop de uma Partida
-
-        loadn r4, #160 ; constante para pular para proxima linha
-        loadn r3, #6   ; quantidade de repeticoes do loop
-        loadn r7, #131 ; posicao da primeira caixinha da primeira linha (pos)
-        loadn r5, #1   ; bool TRUE
+        loadn r4, #160      ; r4 := 160 (constante para pular para proxima linha)
+        loadn r3, #6        ; r3 := 6   (quantidade de repeticoes do loop)
+        loadn r7, #131      ; r7 := 131 (posicao da primeira caixinha da primeira linha [pos])
+        loadn r5, #1        ; r5 := TRUE
         
         main_loop:
             ;; Ler palavra chute
-            call lerPalavra
+            call lerPalavraChute
 
             ;; Checar com resposta e imprimir dicas coloridas
             loadn r1, #palavraChute
@@ -73,6 +82,7 @@ main:
             call checa_resposta
             call imprime_com_dicas
 
+            ;; Testar se o chute estava certo
             load r2, certo
             cmp r2, r5
             jeq vitoria
@@ -82,7 +92,7 @@ main:
         jnz main_loop
 
         jmp fim_jogo
-        vitoria:
+        vitoria: ;; Se venceu, imprimir mensagem de vitoria
             loadn r0, #1121
             loadn r1, #msg_vitoria
             load r2, Verde
@@ -90,9 +100,13 @@ main:
 
         fim_jogo:
 
+        ;; Compara a variavel de controle do loop com 0
+        ;; Se nao for zero, e por que o loop terminou antes, ou seja,
+        ;; o chute estava incorreto -> derrota
         loadn r0, #0
         cmp r3, r0
         jne nao_derrota
+            ;; Derrota -> imprimir mensagem de derrota e a resposta
             loadn r0, #1041
             loadn r1, #msg_derrota
             load r2, Vermelho
@@ -112,6 +126,7 @@ main:
         ;; Ler se o usuario quer continuar jogando
         call denovo_pergunta
 
+        ;; Se for 's', comecar nova partida
         loadn r0, #sim_ou_nao
         loadi r0, r0
         loadn r1, #'s'
@@ -127,8 +142,17 @@ main:
 	
 ;---- Inicio das Subrotinas -----
 
+;;----------------------------------
+;;------ DEFINIR COLORACAO ---------
+;;----------------------------------
+;; Rotina que compara a palavra-chute com a palavra-resposta para
+;; determinar o vetor de coloracao, o qual ira servir para imprimir
+;; a palavra-chute da tentativa com as dicas coloridas, que sao:
+;; * Vermelho: letra nao presente na palavra resposta
+;; * Amarelo:  letra presente na palavra resposta mas em outra posicap
+;; * Verde:    letra presente na palavra resposta na posicao correta
 definir_coloracao:
-    push fr
+    push fr ; proteger flag register
     push r0 ; <livre>
     push r1 ; <livre>
     push r2 ; <livre>
@@ -138,13 +162,15 @@ definir_coloracao:
     push r6 ; j
     push r7 ; <livre>
 
+    ;; Zerar vetor de coloracao (tudo VERMELHO(0)), checado_no_chute e checado_na_resposta
     call zerar_variaveis_de_checagem
     
-    loadn r3, #palavraChute
-    load r4, palavraResposta 
+    loadn r3, #palavraChute  ;; r3 := &palavraChute[0]
+    load r4, palavraResposta ;; r4 := &palavraresposta[0]
 
+    ;; Loop1 : Checar letras em mesma posicao ("Testa-Verde")
     ;; r5 := i
-    loadn r5, #0
+    loadn r5, #0 ;; i = 0 (inicializacao da variavel de controle do loop1)
     definir_coloracao_loop1:
         add r1, r3, r5  ;r1 = &palavraChute[i]
         add r2, r4, r5  ;r2 = &palavraResposta[i]
@@ -152,6 +178,9 @@ definir_coloracao:
         loadi r1, r1  ;r1 = palavraChute[i]
         loadi r2, r2  ;r2 = palavraResposta[i]
 
+        ;; Comparar letras em mesma posicao para ver se sao iguais e, se forem:
+        ;; * Setar vetor de coloracao para VERDE(2) na posicao
+        ;; * Setar vetores de checa_na_resposta e checado_no_chute para TRUE na posicao
         cmp r1, r2 ; palavraChute[i] == palavraResposta[i] ? seguir : loop continue
         jne nao_sao_iguais_em_mesma_posicao
             loadn r1, #coloracao 
@@ -166,39 +195,44 @@ definir_coloracao:
             storei r1, r0 ; coloracao[i] = 2 {VERDE}
 
             loadn r0, #1
-            storei r2, r0 ; checado_na_resposta[i] = True
-            storei r7, r0 ; checado_no_chute[i] = True
+            storei r2, r0 ; checado_na_resposta[i] = TRUE
+            storei r7, r0 ; checado_no_chute[i] = TRUE
 
         nao_sao_iguais_em_mesma_posicao:        
 
-        inc r5
+        inc r5 ;; incrementar variavel i de controle do loop1
+        ;; continuar no loop enquanto i nao for 5
         loadn r0, #5
         cmp r5, r0
-        jne definir_coloracao_loop1
+        jne definir_coloracao_loop1 
     definir_coloracao_fim_loop1:
     
+    ;; Loop2 (externo e interno): Checar letras em outras posicoes ("Testa-Amrelo-ou-Vermelho")
     ;; r5 := i & r6 := j
-
-    loadn r5, #0
+    loadn r5, #0 ;; i = 0 (inicializacao da variavel de controle do loop2 externo)
     definir_coloracao_loop2_externo:
+        ;;;; Primeiro ver se posicao já foi checada no chute. Se sim, passar para proxima
         loadn r1, #checado_no_chute
         add r1, r1, r5  ; r1 = &checado_no_chute[i]
         loadi r1, r1    ; r1 = checado_no_chute[i]
-        loadn r0, #1    ; r0 = True
-        cmp r1, r0      ; checado_no_chute[i] == True ? loop continue : seguir
+        loadn r0, #1    ; r0 = TRUE
+        cmp r1, r0      ; checado_no_chute[i] == TRUE ? loop continue : seguir
         jeq definir_coloracao_loop2_externo_continue
         ;;;; ----
 
-        ;;;
-        loadn r6, #0
+        loadn r6, #0 ;; i = 0 (inicializacao da variavel de controle do loop2 interno)
         definir_coloracao_loop2_interno:
+            ;;;; Primeiro ver se posicao já foi checada na resposta. Se sim, passar para proxima
             loadn r1, #checado_na_resposta
             add r1, r1, r6 ; r1 = &checado_na_resposta[j]
             loadi r1, r1   ; r1 = checado_na_resposta[j]
-            loadn r0, #1   ; r0 = True
-            cmp r1, r0     ; checado_na_resposta[i] == True ? loop continue : seguir
+            loadn r0, #1   ; r0 = TRUE
+            cmp r1, r0     ; checado_na_resposta[i] == TRUE ? loop continue : seguir
             jeq definir_coloracao_loop2_interno_continue
             ;;;; ----
+
+            ;; Comparar a letra do chute na posicao com a da resposta na posicao j.
+            ;; Se forem iguais, setar vetor de coloracao na posicao i para AMARELO(1)
 
             add r1, r3, r5 ; r1 = &palavraChute[i]
             add r2, r4, r6 ; r2 = &palavraResposta[j]
@@ -217,21 +251,23 @@ definir_coloracao:
                 add r2, r2, r5 ; r2 = &checado_no_chute[i]
                 add r7, r7, r6 ; r3 = &checa_na_resposta[j]
 
-                loadn r0, #1   ; const True ou AMARELO
+                loadn r0, #1   ; const TRUE ou AMARELO
 
                 storei r1, r0 ; coloracao[i] = 1 {AMARELO}
-                storei r2, r0 ; checado_no_chute[i] = True
-                storei r7, r0 ; checa_na_resposta[j] = True
+                storei r2, r0 ; checado_no_chute[i] = TRUE
+                storei r7, r0 ; checa_na_resposta[j] = TRUE
         
         definir_coloracao_loop2_interno_continue:
-            inc r6
+            inc r6 ;; incrementar variavel j de controle do loop2 interno
+            ;; continuar no loop enquanto j nao for 5
             loadn r0, #5
             cmp r6, r0
             jne definir_coloracao_loop2_interno
         definir_coloracao_fim_loop2_interno:
         ;;;
     definir_coloracao_loop2_externo_continue:
-        inc r5
+        inc r5 ;; incrementar variavel i de controle do loop2 externo
+        ;; continuar no loop enquanto i nao for 5
         loadn r0, #5
         cmp r5, r0
         jne definir_coloracao_loop2_externo
@@ -249,6 +285,13 @@ definir_coloracao:
     
     rts
 
+;;-------------------------------
+;;------ CHECA RESPOSTA ---------
+;;-------------------------------
+;; Rotina que compara a palavra-chute com a palavra-resposta para
+;; ver se sao iguais. Se forem, seta variavel certo para TRUE (1).
+;; Caso contrario, seta certo para FALSE (0)
+
 checa_resposta:
     push fr
     push r0 
@@ -257,25 +300,29 @@ checa_resposta:
     push r3 ; endereco da letra chute
     push r4 ; endereco da letra resposta 
 
-    loadn r0, #5 ; controlador do loop
+    loadn r0, #5 ; controlador do loop (5 repeticoes)
 
-    loadn r3, #palavraChute
-    load r4, palavraResposta 
+    loadn r3, #palavraChute  ;; r3 := &palavraChute[0]
+    load r4, palavraResposta ;; r4 := &palavraresposta[0]
 
+    ;; Loop que compara chute e resposta letra a letra
     checa_resposta_loop:
-        loadi r1, r3
-        loadi r2, r4
+        loadi r1, r3 ;; r1 = palavraChute[i]
+        loadi r2, r4 ;; r2 = palavraresposta[i]
 
+        ;; Se letras forem diferentes, sair do loop
         cmp r1, r2
         jne checa_resposta_fim_loop
 
-        inc r3
-        inc r4
+        inc r3 ;; Passar para proxima letra da palavra-chute
+        inc r4 ;; Passar para proxima letra da palavra-resposta
     dec r0
     jnz checa_resposta_loop
 
     checa_resposta_fim_loop:
 
+    ;; As palavras sao iguais se o loop completou as 5 voltas, ou seja
+    ;; a variavel de controle r0 chegou em 0:
     loadn r1, #0 ;; 0 para comparar
     cmp r0, r1 ;; r0 == 0?
     jeq sao_iguais
@@ -298,6 +345,18 @@ checa_resposta:
     pop fr
 
     rts
+
+;;----------------------------------
+;;------ IMPRIME COM DICAS ---------
+;;----------------------------------
+;; Imprime a palavra-chute com as cores-dicas, baseado no vetor
+;; de coloracao. Os codigos das cores sao:
+;; * 0 : VERMELHO
+;; * 1 : AMARELO
+;; * 2 : VERDE
+;; PARAMS: 
+;; --> r1 eh o endereco da palavra
+;; --> r7 eh a posicao da primeira caixinha em que imprimir
 
 imprime_com_dicas:
     push fr
@@ -370,7 +429,14 @@ imprime_com_dicas:
 
     rts
 
-lerPalavra:  ; Rotina que recebe uma palavraChute (r7 <- posicao primeira letra)
+;;----------------------------------
+;;------ LER PALAVRA CHUTE ---------
+;;----------------------------------
+;; Rotina que le a palavra-chute do jogador enquanto mostra as letras
+;; digitadas dentro das caixinhas de uma determinada linha.
+;; A tecla '1' serve para apagar e e preciso confirmar com ENTER. 
+
+lerPalavraChute:  ; Rotina que recebe uma palavraChute (r7 <- posicao primeira letra)
     ;salva as variaveis anteriores e inicializa as novas
     push fr    ; Protege o registrador de flags
     push r0    ; Recebe letra digitada
@@ -387,7 +453,7 @@ lerPalavra:  ; Rotina que recebe uma palavraChute (r7 <- posicao primeira letra)
     loadn r3, #palavraChute     ; ponteiro para palavra
     loadn r5, #5                ; Tamanho maximo da palavra
     ;----------------
-    lerPalavra_Loop:
+    lerPalavraChute_Loop:
         call digLetra    ; Espera que uma tecla seja digitada e salva na variavel global "Letra"
 
         load r0, Letra        ; Letra --> r0
@@ -395,16 +461,16 @@ lerPalavra:  ; Rotina que recebe uma palavraChute (r7 <- posicao primeira letra)
         ;; Primeiro ver se é enter para nao contar
         loadn r6, #13 ;; enter(13)
         cmp r0, r6
-        jeq lerPalavra_Loop
+        jeq lerPalavraChute_Loop
         ;; --------------------------------------
 
         cmp r0, r1          ;comparacao se r0 eh '1' (nosso backspace)
-        jne lerPalavra_segue        ; se for '1' (nosso backspace)
+        jne lerPalavraChute_segue        ; se for '1' (nosso backspace)
 
         eh_backspace:
             loadn r6, #0  ; para comparar com 0
             cmp r2, r6    ; r2 == 0?
-            jeq lerPalavra_Loop ; se for, volta para o loop
+            jeq lerPalavraChute_Loop ; se for, volta para o loop
 
             dec r2 ; se nao for 0, decrementa tamanho da palavra
             dec r7 ;    e decrementa 4 na posicao de escrita
@@ -414,8 +480,8 @@ lerPalavra:  ; Rotina que recebe uma palavraChute (r7 <- posicao primeira letra)
             loadn r0, #' ' ; e vai escrever espaço em cima da ultima posicao 
             outchar r0, r7 ; imprime na posicao
 
-            jmp lerPalavra_Loop
-        lerPalavra_segue:
+            jmp lerPalavraChute_Loop
+        lerPalavraChute_segue:
         
         add r4, r3, r2
         storei r4, r0        ; palavra[r2] = Letra
@@ -428,22 +494,22 @@ lerPalavra:  ; Rotina que recebe uma palavraChute (r7 <- posicao primeira letra)
             inc r7
 
             cmp r2, r5            ; verifica se r2 = 5 (tam maximo)
-        jne lerPalavra_Loop      ; Se for, sai, senao goto loop!!
+        jne lerPalavraChute_Loop      ; Se for, sai, senao goto loop!!
         ;; eh o tamanho maximo -> aguardar enter ou '1' (nosso backspace)
 
         loadn r6, #13 ;; enter(13)
-        lerPalavrar_loop_enter:
+        lerPalavraChute_loop_enter:
             call digLetra    ; Espera que uma tecla seja digitada e salva na variavel global "Letra"
 
             load r0, Letra        ; Letra --> r0
             cmp r0, r6          ;comparacao se r0 eh Enter (13)
-            jeq lerPalavra_End
+            jeq lerPalavraChute_End
 
             cmp r0, r1  ; Eh '1' (nosso backspace)?
             jeq eh_backspace
-        jmp lerPalavrar_loop_enter
+        jmp lerPalavraChute_loop_enter
           
-    lerPalavra_End:
+    lerPalavraChute_End:
     ; Poe um \0 no final da palavra pra poder imprimir e testar!!
     loadn r0, #0
     add r4, r3, r2
@@ -458,6 +524,12 @@ lerPalavra:  ; Rotina que recebe uma palavraChute (r7 <- posicao primeira letra)
     pop r0
     pop fr
     rts    
+
+;;--------------------------------
+;;------ SORTEAR PALAVRA ---------
+;;--------------------------------
+;; Sorteia palavra-respota baseado no numero Rand e salva
+;; endereco da palavra sorteada em palavraResposta.
 
 sortearPalavra:
     push R0
@@ -483,6 +555,14 @@ sortearPalavra:
 
     RTS
 
+;;--------------------------
+;;------ DE NOVO ? ---------
+;;--------------------------
+;; Rotina que pergunta para o jogador se ele que jogar mais uma partida.
+;; Lendo da variavel sim_ou_nao: se for 's', indica que o usuário quer
+;; jogar mais uma rodada. Se for qualquer outra coisa, indica que o jogador
+;; nao quer mais continuas jogando.
+
 denovo_pergunta:
     push r0
     push r1
@@ -506,6 +586,11 @@ denovo_pergunta:
     pop r1
     pop r0
     rts
+
+;;--------------------------------
+;;------ PRINT CAIXINHAS ---------
+;;--------------------------------
+;; Rotina para imprimir as 6 linhas de 5 caixinhas do jogo
 
 printCaixinhas:
     push R0
@@ -543,9 +628,13 @@ printCaixinhas:
 
     rts
 
-;********************************************************
-;                   DIGITE UMA LETRA
-;********************************************************
+;;---------------------------------
+;;------ DIGITE UMA LETRA ---------
+;;---------------------------------
+;; Rotina que le uma letra e salva na variavel Letra.
+;; Alem disso, aproveita o loop de entrada para gerar um numero
+;; pseudoaleatorio entre 0 e (n_palavras - 1), que ira ajudar
+;; a sortear uma palavra para as partidas do jogo
 
 digLetra:	; Espera que uma tecla seja digitada e salva na variavel global "Letra"
 	push fr		; Protege o registrador de flags
@@ -591,7 +680,12 @@ digLetra:	; Espera que uma tecla seja digitada e salva na variavel global "Letra
 
 	rts
 
-Imprimestr:		;  Rotina de Impresao de Mensagens:    
+;;------------------------------- 
+;;------ IMPRIME STRING ---------
+;;-------------------------------
+;;  Rotina de Impresao de Mensagens:
+
+Imprimestr:		    
 				; r0 = Posicao da tela que o primeiro caractere da mensagem sera' impresso
 				; r1 = endereco onde comeca a mensagem
 				; r2 = cor da mensagem
@@ -625,6 +719,11 @@ ImprimestrSai:
 	pop r0
 	rts		; retorno da subrotina
 
+;;---------------------------------- 
+;;------ PRINT QUADRADINHO ---------
+;;----------------------------------
+;; Rotina para imprimir a tela inicial do jogo
+
 printTelaInicial:
   push R0
   push R1
@@ -651,23 +750,10 @@ printTelaInicial:
   pop R0
   rts
 
-limparTela:
-	push fr
-	push r5
-	push r6
-	
-	loadn r5, #1200
-	loadn r6, #' '
-	
-	limparTelaLoop:
-		dec r5
-		outchar r6, r5
-		jnz limparTelaLoop
-	
-	pop r6
-	pop r5
-	pop fr
-	rts
+;;---------------------------------- 
+;;------ PRINT QUADRADINHO ---------
+;;----------------------------------
+;; Rotina para imprimir desenho de um quadrado em quadradinhoPosition
 
 printquadradinho:
   push R0
@@ -735,6 +821,17 @@ printHintsScreen:
   pop R0
   rts
 
+;;--------------------------------------------
+;;------ ZERAR VARIAVEIR DE CHECAGEM ---------
+;;--------------------------------------------
+;; As variavei de checagem sao:
+;; * certo : booleana que indica se o chute bate com a resposta
+;; * coloracao : (VERMELHO(0), AMARELO(1), VERDE(2))
+;; * checado_na_resposta : bool[5]
+;; * checado_no_chute : bool[5]
+;; Esta rotina seta todos os valores booleanos para FALSE (0) e
+;; todas as posicoes do vetor de coloracao para VERMELHO (0)
+
 zerar_variaveis_de_checagem:
     push fr
     push r0
@@ -745,17 +842,17 @@ zerar_variaveis_de_checagem:
 
     loadn r0, #0 ; const 0
 
-    store certo, r0 ; inicialmente falso
+    store certo, r0 ; certo := FALSE
 
     loadn r1, #checado_na_resposta  
     loadn r2, #checado_no_chute
     loadn r3, #coloracao
-    loadn r7, #5 ; controle de loop
+    loadn r7, #5 ; controle de loop (5 repeticoes)
 
     zerar_loop:
-        storei r1, r0
-        storei r2, r0
-        storei r3, r0
+        storei r1, r0 ;; checa_na_resposta[i] = FALSE
+        storei r2, r0 ;; checado_no_chute[i] = FALSE
+        storei r3, r0 ;; coloracao[i] = VERMELHO
         inc r1
         inc r2
         inc r3
@@ -771,7 +868,13 @@ zerar_variaveis_de_checagem:
 
     rts
 
-;;;;
+;;------------------------------- 
+;;------ LER SIM OU NAO ---------
+;;------------------------------- 
+;; Rotina similar a de ler palavra-chute, mas destinada a ler
+;; a string sim_ou_nao de 1 caractere, que se for lida como "s",
+;; indicara que o jogador que jogar mais uma partida.
+;; É possível apagar com a tecla '1' e e necessario confirmar com ENTER.
 
 lerSimouNao:  ; Rotina que recebe uma palavraChute (r7 <- posicao primeira letra)
     ;salva as variaveis anteriores e inicializa as novas
@@ -864,15 +967,17 @@ lerSimouNao:  ; Rotina que recebe uma palavraChute (r7 <- posicao primeira letra
 
 ;;;;
 
-;-----------------------------------------------------------------------------------------------
+;;-------------------------
+;;--- OUTRAS DEFINICOES ---
+;;-------------------------
 
-;; --- Vetor de coloracao ---
-    ;; 0 -> vermelho
-    ;; 1 -> amarelo
-    ;; 2 -> verde
+;; --- Vetor de Coloracao ---
+    ;; 0 -> VERMELHO (letra nao esta na resposta)
+    ;; 1 -> AMARELO  (letra na resposta em outra posicao)
+    ;; 2 -> VERDE    (letra na resposta em posicao correta)
     coloracao: var #5
 
-;; --- variaveis de conferencia --- 
+;; --- Variaveis de Checagem --- 
     certo: var #1 ; booleano para dizer se a palavra bateu ou não
     checado_na_resposta: var #5
     checado_no_chute: var #5
