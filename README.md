@@ -5,6 +5,7 @@
 | Paulo Henrique dos Santos Almeida | 12543926  |
 | Theo da Mota dos Santos           | 10691331  |
 
+<div style="text-align: right">
 # Item 1 - Assembleco
 Inspirados no famoso jogo Wordle, especialmente em sua versão chamada ["Letreco" (desenvolvida por Gabriel Toschi)](https://github.com/gabtoschi/letreco), decidimos criar uma versão em Assembly para o Processador do ICMC. O jogo consiste na advinhação de uma palavra de 5 letras dentre 6 tentativas. Para auxiliar, são dadas dicas sobre a existência e a posição das letras em cada tentativa. Para tanto, elas são coloridas com:
 * Vermelho: indicando que a letra não está presente na palavra-resposta
@@ -40,3 +41,4 @@ A derrota ocorre quanto o jogador não consegue adivinhar a palavra-resposta den
 ## 3.1. Modificar o projeto na FPGA
 ## 3.2. Modificar o Montador para que reconheça a nova Instrução
 ## 3.3. Modificar o Manual do Processador, descrevendo sua nova Instrução (e alteraçao na Arquitetura)
+</div>
