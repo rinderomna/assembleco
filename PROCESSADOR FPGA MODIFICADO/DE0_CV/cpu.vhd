@@ -2,6 +2,8 @@
 -- Jeg e Ceg  concertado!!
 -- Video com 16 cores e tela de 40 colunas por 30 linhas
 
+--2022/07 Feito por HELIO,PAULO e THEO
+
 libraRY ieee;
 use ieee.std_LOGIC_1164.all;
 use ieee.std_LOGIC_ARITH.all;
@@ -78,8 +80,10 @@ ARCHITECTURE main of cpu is
 	CONSTANT SHIFT			: STD_LOGIC_VECTOR(3 downto 0) := "0000";		-- SHIFTL0 RX,n / SHIFTL1 RX,n / SHIFTR0 RX,n / SHIFTR1 RX,n / ROTL RX,n / ROTR RX,n
 																							-- SHIFT/Rotate RX	-- b6=shif/rotate: 0/1  b5=left/right: 0/1; b4=fill; 	
 																							-- Format: < inst(6) | RX(3) |  b6 b5 b4 | nnnn >
-												
+	
+	CONSTANT CMPZ 			: STD_LOGIC_VECTOR(3 downto 0) := "0111";		-- CMP RX 			-- Compare RX with 0 and set FR :   Format: < inst(6) | RX(3) |  xxx  | xxxx >   Flag Register: <...DIVbyZero|StackUnderflow|StackOverflow|DIVByZero|ARITHmeticOverflow|carRY|zero|equal|lesser|greater>
 	CONSTANT CMP 			: STD_LOGIC_VECTOR(3 downto 0) := "0110";		-- CMP RX RY  		-- Compare RX and RY and set FR :   Format: < inst(6) | RX(3) | RY(3) | xxxx >   Flag Register: <...DIVbyZero|StackUnderflow|StackOverflow|DIVByZero|ARITHmeticOverflow|carRY|zero|equal|lesser|greater>
+
 																							-- JMP Condition: (UNconditional, EQual, Not Equal, Zero, Not Zero, CarRY, Not CarRY, GReater, LEsser, Equal or Greater, Equal or Lesser, OVerflow, Not OVerflow, Negative, DIVbyZero, NOT USED)	
 
 	-- FLOW CONTROL Instructions:	
@@ -426,7 +430,7 @@ begin
 --========================================================================
 -- LOGIC OPERATION ('SHIFT', and 'CMP'  NOT INCLUDED)  			RX <- RY (?) RZ
 --========================================================================		
-			IF(IR(15 DOWNTO 14) = LOGIC AND IR(13 DOWNTO 10) /= SHIFT AND IR(13 DOWNTO 10) /= CMP) THEN 
+			IF(IR(15 DOWNTO 14) = LOGIC AND IR(13 DOWNTO 10) /= SHIFT AND IR(13 DOWNTO 10) /= CMP AND IR(13 DOWNTO 10) /= CMPZ) THEN 
 				LoadReg(RX) := '1';
 				M3 := Reg(RY);
 				x <= M3;
@@ -448,6 +452,24 @@ begin
 				M3 := Reg(RX);
 				x <= M3;
 				M4 := Reg(RY);
+				y <= M4;
+			
+				OP(6) <= '0';
+				OP(5 DOWNTO 4) <= LOGIC;
+				OP(3 DOWNTO 0) <= CMP;
+				
+				selM6 := sULA;
+				LoadFR := '1';
+				
+				state := fetch;
+			END IF;
+--========================================================================
+-- CMPZ		RX
+--========================================================================		
+			IF(IR(15 DOWNTO 14) = LOGIC AND IR(13 DOWNTO 10) = CMPZ) THEN 
+				M3 := Reg(RX);
+				x <= M3;
+				M4 := "0000000000000000";
 				y <= M4;
 			
 				OP(6) <= '0';
