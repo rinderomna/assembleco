@@ -719,9 +719,9 @@ ImprimestrSai:
 	pop r0
 	rts		; retorno da subrotina
 
-;;---------------------------------- 
-;;------ PRINT QUADRADINHO ---------
-;;----------------------------------
+;;----------------------------------- 
+;;------ PRINT TELA INICIAL ---------
+;;-----------------------------------
 ;; Rotina para imprimir a tela inicial do jogo
 
 printTelaInicial:
@@ -794,6 +794,12 @@ printquadradinho:
   pop R1
   pop R0
   rts
+
+;;----------------------------------- 
+;;------ PRINT HINTS SCREEN ---------
+;;-----------------------------------
+;; Rotina para imprimir tela com instruções para apagar letra ('1') e
+;; para enviar palavra ('ENTER')
 
 printHintsScreen:
   push R0
