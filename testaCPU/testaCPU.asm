@@ -158,7 +158,7 @@ CallSai:
         outchar r2, r0
         jmp Fim
     cmpz_deu_certo:
-        outchar r3, r0
+        outchar r1, r0
 	
 Fim:	
 	halt
